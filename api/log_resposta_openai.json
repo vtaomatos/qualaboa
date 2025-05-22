@@ -1,0 +1,36 @@
+{
+  "id": "chatcmpl-BZoleQeQzxPoX5bFLPbJXuLkTVZKH",
+  "object": "chat.completion",
+  "created": 1747876330,
+  "model": "gpt-3.5-turbo-0125",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Claro! Em Santos, você pode encontrar várias opções de lugares que costumam ter eventos de pagode. Alguns locais conhecidos são o Bar do Toninho, o Boteco Boa Vista e o Deck 22. Recomendo que você verifique a programação desses estabelecimentos para encontrar um evento de pagode que esteja de acordo com sua preferência de data e horário. Divirta-se!",
+        "refusal": null,
+        "annotations": []
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 48,
+    "completion_tokens": 93,
+    "total_tokens": 141,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "audio_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "audio_tokens": 0,
+      "accepted_prediction_tokens": 0,
+      "rejected_prediction_tokens": 0
+    }
+  },
+  "service_tier": "default",
+  "system_fingerprint": null
+}
