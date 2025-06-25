@@ -91,14 +91,14 @@ INSERT INTO eventos (
 ('Música ao Vivo no Meu Lugar',
  'Bandas locais, MPB/samba/pagode possíveis; quinta-feira ao domingo.',
  '2025-06-12 20:00:00','html','',NULL,
- -23.9655556,-46.3097222,'2025-06-06 00:00:00',
+ -23.964925422301427,-46.3094853841148,'2025-06-06 00:00:00',
  'Rua Almirante Tamandaré, 284 - Estuário, Santos, SP',
  '@meulugar.bar','https://www.instagram.com/meulugar.bar'),
 
 ('Feijoada com Música ao Vivo',
  'Feijoada de sábado com MPB e samba/pagode possíveis.',
  '2025-06-14 12:00:00','html','',NULL,
- -23.9655556,-46.3097222,'2025-06-06 00:00:00',
+ -23.964925422301427,-46.3094853841148,'2025-06-06 00:00:00',
  'Rua Almirante Tamandaré, 284 - Estuário, Santos, SP',
  '@meulugar.bar','https://www.instagram.com/meulugar.bar'),
 
@@ -123,24 +123,24 @@ INSERT INTO eventos (
 -- Missas na Catedral de Santos
 ('Missa Dominical na Catedral – Domingo 09h', '2025-06-15 09:00:00', 'html',
  '<p>Missa dominical na Catedral de Nossa Senhora do Rosário às 09h.</p>', NULL,
- -23.9367318, -46.327424, 'Missa católica aberta ao público todas as manhãs de domingo.', 'Praça Patriarca José Bonifácio, s/nº, Centro, Santos – SP'),
+ -23.9366450467105, -46.32437621692497, 'Missa católica aberta ao público todas as manhãs de domingo.', 'Praça Patriarca José Bonifácio, s/nº, Centro, Santos – SP'),
 
 ('Missa Dominical na Catedral – Domingo 18h', '2025-06-15 18:00:00', 'html',
  '<p>Missa dominical na Catedral de Nossa Senhora do Rosário às 18h.</p>', NULL,
- -23.9367318, -46.327424, 'Missa vespertina dominical.', 'Praça Patriarca José Bonifácio, s/nº, Centro, Santos – SP'),
+ -23.9366450467105, -46.32437621692497, 'Missa vespertina dominical.', 'Praça Patriarca José Bonifácio, s/nº, Centro, Santos – SP'),
 
 -- Cultos na Cristo é a Resposta
 ('Culto de Oração – Cristo é a Resposta (Terça 20h)', '2025-06-17 20:00:00', 'imagem',
  NULL, 'https://cristoearesposta.com.br/wp-content/uploads/2025/06/culto-terca-20h.jpg',
- -23.9524637, -46.3292614, 'Culto de Oração todas as terças às 20h. Igreja acessível, com intérprete de Libras.', 'Av. Washington Luís, 136, Canal 3, Santos – SP'),
+ -23.952154720434788, -46.32639081258822, 'Culto de Oração todas as terças às 20h. Igreja acessível, com intérprete de Libras.', 'Av. Washington Luís, 136, Canal 3, Santos – SP'),
 
 ('Culto de Celebração – Cristo é a Resposta (Domingo 10h45)', '2025-06-15 10:45:00', 'html',
  '<p>Culto de Celebração com Escola Dominical aos domingos às 10h45.</p>', NULL,
- -23.9524637, -46.3292614, 'Celebração dominical com Escola Dominical para crianças.', 'Av. Washington Luís, 136, Canal 3, Santos – SP'),
+ -23.952154720434788, -46.32639081258822, 'Celebração dominical com Escola Dominical para crianças.', 'Av. Washington Luís, 136, Canal 3, Santos – SP'),
 
 ('Culto Espaço Jovem – Cristo é a Resposta (Sábado 20h)', '2025-06-14 20:00:00', 'imagem',
  NULL, 'https://cristoearesposta.com.br/wp-content/uploads/2025/06/culto-espaco-jovem.jpg',
- -23.9524637, -46.3292614, 'Culto dedicado ao público jovem aos sábados às 20h.', 'Av. Washington Luís, 136, Canal 3, Santos – SP'),
+ -23.952154720434788, -46.32639081258822, 'Culto dedicado ao público jovem aos sábados às 20h.', 'Av. Washington Luís, 136, Canal 3, Santos – SP'),
 
 -- Cultos na Igreja Luterana de Santos
 ('Culto Luterano – 1º/3º Domingo 19h', '2025-06-01 19:00:00', 'html',
@@ -154,11 +154,11 @@ INSERT INTO eventos (
 -- Cultos na Assembleia de Deus - Macuco
 ('Culto da Assembleia – Domingo 09h', '2025-06-15 09:00:00', 'html',
  '<p>Culto dominical com ensino bíblico às 09h.</p>', NULL,
- -23.9606508, -46.3148864, 'Culto na Assembleia de Deus, bairro Macuco.', 'Av. Siqueira Campos, 161, Macuco, Santos – SP'),
+ -23.956860487518345, -46.31868107962193, 'Culto na Assembleia de Deus, bairro Macuco.', 'Av. Siqueira Campos, 161, Macuco, Santos – SP'),
 
 ('Culto de Doutrina – Terça 19h45', '2025-06-17 19:45:00', 'html',
  '<p>Culto de Doutrina nas terças-feiras às 19h45.</p>', NULL,
- -23.9606508, -46.3148864, 'Reunião de estudo bíblico e doutrina.', 'Av. Siqueira Campos, 161, Macuco, Santos – SP');
+ -23.956860487518345, -46.31868107962193, 'Reunião de estudo bíblico e doutrina.', 'Av. Siqueira Campos, 161, Macuco, Santos – SP');
 
 
 
@@ -215,8 +215,8 @@ INSERT INTO locais (nome, endereco, latitude, longitude, instagram, linkInstagra
 (
   'Meu Lugar Bar',
   'Rua Almirante Tamandaré, 284, Estuário, Santos – SP, 11010-200',
-  -23.9655556,
-  -46.3097222,
+  -23.964925422301427,
+  -46.3094853841148,
   '@meulugar.bar',
   'https://www.instagram.com/meulugar.bar'
 ),
@@ -230,8 +230,8 @@ INSERT INTO locais (nome, endereco, latitude, longitude, instagram, linkInstagra
 );
 
 INSERT INTO locais (nome, endereco, latitude, longitude) VALUES
-('Catedral de Santos', 'Praça Patriarca José Bonifácio, s/nº, Centro, Santos – SP', -23.9367318, -46.327424),
-('Cristo é a Resposta', 'Av. Washington Luís, 136, Canal 3, Santos – SP', -23.9524637, -46.3292614),
+('Catedral de Santos', 'Praça Patriarca José Bonifácio, s/nº, Centro, Santos – SP', -23.9366450467105, -46.32437621692497),
+('Cristo é a Resposta', 'Av. Washington Luís, 136, Canal 3, Santos – SP', -23.952154720434788, -46.32639081258822),
 ('Igreja Luterana de Santos', 'Avenida General Francisco Glicério, 626, Santos – SP', -23.9641872, -46.3489439),
-('Assembleia de Deus Macuco', 'Av. Siqueira Campos, 161, Macuco, Santos – SP', -23.9606508, -46.3148864);
+('Assembleia de Deus Macuco', 'Av. Siqueira Campos, 161, Macuco, Santos – SP', -23.956860487518345, -46.31868107962193);
 
