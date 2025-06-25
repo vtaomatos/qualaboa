@@ -3,11 +3,13 @@ session_start();
 $ip = $_SERVER['REMOTE_ADDR'];
 $tempo_bloqueio = 20 * 60; // 20 minutos
 
+// Inicializa arrays de sessão
 $_SESSION['tentativas'] = $_SESSION['tentativas'] ?? [];
 $_SESSION['bloqueio'] = $_SESSION['bloqueio'] ?? [];
 
 $bloqueado = false;
 
+// Verifica bloqueio
 if (isset($_SESSION['bloqueio'][$ip])) {
     $tempo_passado = time() - $_SESSION['bloqueio'][$ip];
     if ($tempo_passado < $tempo_bloqueio) {
@@ -19,6 +21,7 @@ if (isset($_SESSION['bloqueio'][$ip])) {
     }
 }
 
+// LOGIN
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["login"])) {
     if (!$bloqueado) {
         $usuario = $_POST["usuario"] ?? '';
@@ -38,6 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["login"])) {
     }
 }
 
+// LOGOUT
 if (isset($_GET["logout"])) {
     session_destroy();
     header("Location: evento.php");
@@ -46,6 +50,7 @@ if (isset($_GET["logout"])) {
 ?>
 
 <?php if (!isset($_SESSION["logado"])): ?>
+<!-- TELA DE LOGIN -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -75,13 +80,12 @@ if (isset($_GET["logout"])) {
 </html>
 
 <?php else: ?>
+<!-- TELA DE CADASTRO -->
 <?php require_once("../config/db.php");
 
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["titulo"])) {
     $titulo = $_POST["titulo"];
     $data_evento = $_POST["data_evento"];
-    $descricao = $_POST["descricao"];
-    $endereco = $_POST["endereco"];
     $tipo_conteudo = $_POST["tipo_conteudo"];
     $flyer_html = ($tipo_conteudo === 'html') ? $_POST["flyer_html"] : null;
     $latitude = $_POST["latitude"];
@@ -97,9 +101,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["titulo"])) {
         }
     }
 
-    $stmt = $pdo->prepare("INSERT INTO eventos (titulo, data_evento, descricao, endereco, tipo_conteudo, flyer_html, flyer_imagem, latitude, longitude) 
-                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->execute([$titulo, $data_evento, $descricao, $endereco, $tipo_conteudo, $flyer_html, $flyer_imagem, $latitude, $longitude]);
+    $stmt = $pdo->prepare("INSERT INTO eventos (titulo, data_evento, tipo_conteudo, flyer_html, flyer_imagem, latitude, longitude) 
+                           VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->execute([$titulo, $data_evento, $tipo_conteudo, $flyer_html, $flyer_imagem, $latitude, $longitude]);
 
     $sucesso = "Evento cadastrado com sucesso!";
 }
@@ -252,12 +256,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["titulo"])) {
         <label>Data e Hora:</label>
         <input type="datetime-local" name="data_evento" required>
 
-        <label>Descrição:</label>
-        <textarea name="descricao" rows="4" placeholder="Descreva o evento" required></textarea>
-
-        <label>Endereço:</label>
-        <input type="text" name="endereco" placeholder="Rua, número, cidade" required>
-
         <label>Tipo de Flyer:</label>
         <input type="radio" name="tipo_conteudo" value="imagem" checked onchange="toggleFlyer()"> Imagem
         <input type="radio" name="tipo_conteudo" value="html" onchange="toggleFlyer()"> HTML
@@ -281,7 +279,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["titulo"])) {
         <button type="submit">Cadastrar</button>
 
         <div class="sair"><a href="?logout=1">Sair</a></div>
-
+    
     </form>
 </body>
 </html>
