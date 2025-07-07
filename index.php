@@ -16,7 +16,7 @@ $horaFiltro = $_GET['hora'] ?? '00:00';
 
 // Preparar e executar query
 $sql = "SELECT * FROM eventos WHERE DATE(data_evento) = :data AND TIME(data_evento) >= :hora";
-$stmt = $conn->prepare($sql);  // aqui, trocar $conn por $pdo
+$stmt = $conn->prepare($sql);
 $stmt->bindValue(':data', $dataFiltro);
 $stmt->bindValue(':hora', $horaFiltro);
 $stmt->execute();
@@ -139,8 +139,10 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
       eventos.forEach(e => {
         const instagramTag = e.linkInstagram && e.instagram ? `<a href="${e.linkInstagram}" target="_blank">${e.instagram}</a>` : '';
 
-        const flyer = e.flyer_imagem ? `<img src="admin/assets/uploads/${e.flyer_imagem}" alt="Flyer" style="max-width: 100%;">` : `${e.flyer_html}`;
-
+        const flyerBloob = e.imagem_base64 ? `<img src="data:image/png;base64,${e.imagem_base64}" alt="Flyer" style="max-width: 100%;">` : '';
+        const flyer = e.flyer_imagem ? `<img src="admin/assets/uploads/${e.flyer_imagem}" alt="Flyer" style="max-width: 100%;">` : '';
+        const flyerHtml = e.flyer_html ? `<div style="max-width: 100%;">${e.flyer_html}</div>` : '';
+        
         const content = `
           <div id="${e.id}" style="max-width: 250px; font-family: Arial, sans-serif;">
             <h3 style="margin: 0 0 8px 0; font-size: 16px; color: #333;">${e.titulo}</h3>
@@ -152,7 +154,7 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
               font-size: 14px;
               color: #555;
             ">
-              ${e.flyer_html}
+              ${flyerBloob ? flyerBloob : (flyer ? flyer : (flyerHtml ? flyerHtml : e.descricao))}
             </div>
             `+ instagramTag +`
           </div>
