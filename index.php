@@ -1,8 +1,8 @@
 <?php
-// Conexão com banco SQLite
+require_once 'config/db.php';
+
 try {
-    $pdo = new PDO('sqlite:' . __DIR__ . '/database.sqlite');
-    $stmt = $pdo->prepare('SELECT * FROM eventos');
+    $stmt = $conn->prepare('SELECT * FROM eventos limit 1');
     $stmt->execute();
     $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
@@ -16,7 +16,7 @@ $horaFiltro = $_GET['hora'] ?? '00:00';
 
 // Preparar e executar query
 $sql = "SELECT * FROM eventos WHERE DATE(data_evento) = :data AND TIME(data_evento) >= :hora";
-$stmt = $pdo->prepare($sql);  // aqui, trocar $conn por $pdo
+$stmt = $conn->prepare($sql);  // aqui, trocar $conn por $pdo
 $stmt->bindValue(':data', $dataFiltro);
 $stmt->bindValue(':hora', $horaFiltro);
 $stmt->execute();

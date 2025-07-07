@@ -1,6 +1,8 @@
 <?php
 // api/chat.php
-require_once '../variables.php';
+require_once '../secretsConstants.php';
+require_once '../config/db.php';
+
 
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
@@ -19,15 +21,13 @@ if (!$pergunta) {
 }
 
 try {
-    $pdo = new PDO('sqlite:' . __DIR__ . '/../database.sqlite');
-
     $dataFiltro = $data ?? date('Y-m-d', strtotime('-5 hours'));
     $horaFiltro = $hora ?? '00:00:00';
 
     if (empty($eventos)) {
         // Preparar e executar query
         $sql = "SELECT * FROM eventos WHERE DATE(data_evento) = :data AND TIME(data_evento) >= :hora";
-        $stmt = $pdo->prepare($sql);
+        $stmt = $conn->prepare($sql);
         $stmt->bindValue(':data', $dataFiltro);
         $stmt->bindValue(':hora', $horaFiltro);
         $stmt->execute();
@@ -61,7 +61,7 @@ Responda de forma amigável e com base no interesse do usuário como um agente d
 TXT;
 
 // Chamada para API da OpenAI (exemplo, ajuste sua API Key)
-$apiKeyUse = $apiKey ?: '';
+$apiKeyUse = APIKEY ?: '';
 
 if (!$apiKeyUse) {
     echo json_encode(['erro' => 'API Key não configurada']);
