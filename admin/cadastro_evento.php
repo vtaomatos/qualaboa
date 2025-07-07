@@ -1,4 +1,7 @@
 <?php
+require_once("../secretsConstants.php");
+require_once("../config/db.php");
+
 session_start();
 $ip = $_SERVER['REMOTE_ADDR'];
 $tempo_bloqueio = 20 * 60; // 20 minutos
@@ -24,7 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["login"])) {
         $usuario = $_POST["usuario"] ?? '';
         $senha = $_POST["senha"] ?? '';
 
-        if ($usuario === "admin" && $senha === "1234") {
+        if ($usuario === HARDCODEUSER && $senha === HARDCODEPASS) {
             $_SESSION["logado"] = true;
         } else {
             $_SESSION['tentativas'][$ip] = ($_SESSION['tentativas'][$ip] ?? 0) + 1;
@@ -53,9 +56,9 @@ if (isset($_GET["logout"])) {
     <title>Login</title>
     <style>
         body { font-family: Arial, sans-serif; background-color: #f2f2f2; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        form { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 300px; }
+        form { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 300px; text-align: center; }
         h2 { margin-bottom: 20px; text-align: center; }
-        input, button { width: 100%; padding: 10px; margin: 10px 0; }
+        input, button { width: 260px; padding: 10px; margin: 10px; }
         .erro { color: red; text-align: center; }
     </style>
 </head>
@@ -97,7 +100,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["titulo"])) {
         }
     }
 
-    $stmt = $pdo->prepare("INSERT INTO eventos (titulo, data_evento, descricao, endereco, tipo_conteudo, flyer_html, flyer_imagem, latitude, longitude) 
+    $stmt = $conn->prepare("INSERT INTO eventos (titulo, data_evento, descricao, endereco, tipo_conteudo, flyer_html, flyer_imagem, latitude, longitude) 
                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->execute([$titulo, $data_evento, $descricao, $endereco, $tipo_conteudo, $flyer_html, $flyer_imagem, $latitude, $longitude]);
 
