@@ -1,5 +1,5 @@
 #regiao-2 #map {
-  height: 38vh;
+  height: 100vh;
 }
 h2{
   color: #209CEE;
@@ -19,11 +19,101 @@ h2{
   display: flex;
   justify-content: space-around;
   flex-wrap: wrap;
-  background: #f1f9ff;
+  background: #ffffff;
   padding: 1rem 0;
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-} /*
+} 
+
+.regiao-colapsada {
+  display: none;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+
+.toggle-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #007bff;
+  cursor: pointer;
+  margin: 0 auto;
+  display: block;
+}
+
+.toggle-btn:hover {
+  color: #0056b3;
+}
+
+.fixo-rodape {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  padding: 1rem;
+  border-top: 1px solid #ccc;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+  transition: transform 0.3s ease-in-out;
+  padding-top:0;
+}
+
+.fixo-rodape.regiao-colapsada {
+  transform: translateY(100%);
+}
+.fixo-topo {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: #fff;
+  padding: 1rem 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+  transition: transform 0.3s ease-in-out;
+}
+
+.fixo-topo.regiao-colapsada {
+  transform: translateY(-100%);
+}
+
+.gm-style-iw-ch, .gm-style-iw-chr{
+  height: 20px;
+  max-height: 20px;
+  overflow: visible;
+}
+
+#lightbox {
+  display: none;
+  position: fixed;
+  top:0; left:0; width:100%; height:100%;
+  background: rgba(0,0,0,0.8);
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+#lightbox img {
+  max-width: 90%;
+  max-height: 90%;
+}
+.gm-style-iw {
+  max-width: 250px !important;
+  max-height: 400px !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+.slide-img {
+  max-width: 90%;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.gm-ui-hover-effect{
+  z-index: 10;
+}
+
+/*
 
 .btn-buscar{
   width: 100%;
