@@ -56,12 +56,12 @@ h2{
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
   z-index: 999;
   transition: transform 0.3s ease-in-out;
-  padding-top:0;
 }
 
 .fixo-rodape.regiao-colapsada {
   transform: translateY(100%);
 }
+
 .fixo-topo {
   position: fixed;
   top: 0;

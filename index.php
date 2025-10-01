@@ -55,7 +55,7 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
           value="<?= htmlspecialchars($horaFiltro) ?>" /></label>
       <button type="submit" class="col-12 mt-2 btn btn-primary buscar-data">Buscar</button>
     </form>
-    <button class="toggle-btn" onclick="toggleRegiao('form-regiao-1',this)">⮟ Encontre eventos na sua região por data:
+    <button class="toggle-btn" onclick="toggleRegiao('form-regiao-1',this)"> ↓ Encontre eventos na sua região por data:
       <?= $dataFormatada ?></button>
   </div>
 
@@ -77,12 +77,12 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
   <div id="regiao-3" class="fixo-rodape">
     <!-- Chat com IA -->
-    <div class="col-12 pd-2 chat-area">
+    <div id="chat-area" class="col-12 pd-2 chat-area regiao-colapsada">
       <!-- <h2 class="mb-0">Encontre Eventos Com IA</h2> -->
       <!-- <small class="text-muted">"Sou a IA qual é a boa. Vou te ajudar achar o rolê!"</small> -->
-      <div id="chatInput" class="chat-input regiao-colapsada">
+      <div id="chatInput" class="chat-input">
         <input class="form-control mt-3" type="text" id="userInput"
-          placeholder="Ex: IA, me indique um sambinha perto do centro à noite" />
+          placeholder="Ex: IA, quero curtir samba à noite." />
         <button class="btn btn-secondary btn-chat col-12 mt-2" onclick="enviarPergunta()">Enviar</button>
       </div>
       <div id="recomendacoesChat" class="recomendacoes-container">
@@ -91,7 +91,7 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
       <p id="explicacaoIA" class="explicacao-chat"></p>
 
     </div>
-    <button class="toggle-btn toggle-btn-chatInput" onclick="toggleRegiao('chatInput', this)">⮝ Use Ia para encontrar eventos para dia <?= $dataFormatada ?></button>
+    <button class="toggle-btn" onclick="toggleRegiao('chat-area', this)">↑ Use IA para encontrar eventos no dia <?= $dataFormatada ?></button>
   </div>
   <div id="lightbox" onclick="fecharLightbox()">
     <img id="lightbox-img" src="" alt="Imagem Ampliada" />
@@ -247,8 +247,8 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
       const regiao = document.getElementById(regiaoId);
       const colapsada = regiao.classList.toggle('regiao-colapsada');
 
-      const mostrarTexto = regiaoId === 'chatInput' ? `⮝ Use Ia para encontrar eventos para dia ${dataFiltro}` : `⮟ Encontre eventos na sua região por data: ${dataFiltro}`;
-      const ocultarTexto = regiaoId === 'chatInput' ? '⮟ Ocultar' : '⮝ Ocultar';
+      const mostrarTexto = regiaoId === 'chat-area' ? `↑ Use IA para encontrar eventos no dia ${dataFiltro}` : `↓ Encontre eventos na sua região por data: ${dataFiltro}`;
+      const ocultarTexto = regiaoId === 'chat-area' ? '↓ Ocultar' : '↑ Ocultar';
 
       btn.innerHTML = colapsada ? mostrarTexto : ocultarTexto;
     }
@@ -281,11 +281,11 @@ function criarSliderEventos(eventos) {
 
     return `
       <div class="swiper-slide" style="text-align:center">
-        <h3 style="font-size:16px; margin-bottom:5px; white-space: normal; word-break: break-word; margin-right:15px">
+        <h3 style="font-size:16px; margin-bottom:10px; white-space: normal; word-break: break-word; margin-right:15px">
           ${ev.titulo}
         </h3>
         ${imagem}
-        <div style="margin-top:6px;">${instagram}</div>
+        <div style="margin-top:6px; padding-bottom:5px">${instagram}</div>
       </div>
     `;
   }).join('');
