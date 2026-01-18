@@ -1,15 +1,29 @@
 <?php
 // api/chat.php
-require_once '../secretsConstants.php';
-require_once '../config/db.php';
+require_once './../secretsConstants.php';
+require_once './../config/db.php';
+require_once './../rate_limit/rate_limit.php';
 
-ini_set('display_errors', 1);
+if (!empty($_SERVER['RATE_LIMIT_EXCEEDED'])) {
+    echo json_encode([
+        'resposta' => json_encode([
+            'ordem' => [],
+            // 'explicacao' => '⚠️ Muitas requisições. Aguarde um pouco antes de tentar novamente.'
+            'explicacao' => '⚠️ Você atingiu seu limite de 5 prompts gratuitos do dia.'
+        ])
+    ]);
+    exit;
+}
+
+
+// ini_set('display_errors', 1);
 error_reporting(E_ALL);
 date_default_timezone_set('America/Sao_Paulo');
 
 $debug = isset($_GET['debug']) ? true : false;
 
-function log_event($msg) {
+function log_event($msg)
+{
     global $debug;
     $prefix = date('[Y-m-d H:i:s] ');
     if ($debug) {
@@ -25,7 +39,10 @@ log_event("Entrada recebida: " . json_encode($input));
 $pergunta = trim($input['pergunta'] ?? '');
 $data = trim($input['data'] ?? '');
 $hora = trim($input['hora'] ?? '');
+$evento_ids = $input['eventos_id'] ?? [];
 $eventos = $input['eventos'] ?? [];
+
+$query = "";
 
 if (!$pergunta) {
     log_event("Pergunta vazia.");
@@ -39,18 +56,20 @@ try {
 
     log_event("Data filtro: $dataFiltro | Hora filtro: $horaFiltro");
 
-    if (empty($eventos)) {
-        $sql = "SELECT * FROM eventos WHERE DATE(data_evento) = :data AND TIME(data_evento) >= :hora";
-        $stmt = $conn->prepare($sql);
-        $stmt->bindValue(':data', $dataFiltro);
-        $stmt->bindValue(':hora', $horaFiltro);
-        $stmt->execute();
+    $evento_ids = array_map('intval', $evento_ids);
 
-        $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        log_event("Eventos carregados do banco: " . count($eventos));
-    } else {
-        log_event("Eventos recebidos por parâmetro: " . count($eventos));
-    }
+    $placeholders = implode(',', $evento_ids);
+
+    $sql = "SELECT id, titulo, data_evento, descricao, flyer_html as flyer, endereco FROM eventos WHERE id in ($placeholders) AND DATE(data_evento) = :data AND TIME(data_evento) >= :hora";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindValue(':data', $dataFiltro);
+    $stmt->bindValue(':hora', $horaFiltro);
+    $stmt->execute();
+
+    $query = $stmt->queryString;
+
+    $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    log_event("Eventos carregados do banco: " . count($eventos));
 } catch (PDOException $e) {
     log_event("Erro PDO: " . $e->getMessage());
     echo json_encode(['erro' => 'Erro ao conectar ao banco']);
@@ -69,8 +88,9 @@ log_event("Lista formatada de eventos para IA:\n" . $listaEventosTexto);
 
 // Prompt da IA
 $mensagemSistema = <<<TXT
-Receba essa lista de eventos e responda com um json de duas partes;
-A primeira parte do json vai conter todos os ids dos eventos em ordem de relevância para as perguntas do usuário;
+Você é uma IA que vai ajudar a encontrar os melhores eventos que você tem conhecimento disponível no app ou certeza fora dele.
+Com base nessa lista de eventos, responda com um json de duas partes;
+A primeira parte do json vai conter todos os ids dos eventos em ordem de relevância para o prompt do usuário;
 A segunda parte do json vai ser um texto html explicando suas considerações.
 Ex: {"ordem": [1, 2, 3], "explicacao": "Humm vai rolar o evento tal que pode ser essa pegada..."}
 Se não houver eventos na lista, responda com a primeira parte obj vazio e segunda "Nada encontrado".
@@ -78,6 +98,8 @@ Se o usuário fugir do assunto, lembre-o educadamente que você só pode ajudar 
 Lista de eventos disponíveis:
 $listaEventosTexto
 Responda de forma amigável e com base no interesse do usuário como um agente de eventos.
+O usuário pode te mandar prompts como "Balada boa hoje?" ou coisa do tipo, o ajude a identificar quais eventos são baladas e indique o melhor possivel
+Também pode mandar "Jantar a dois" O ajude a encontrar o melhor ambiente calmo para jantar a dois.
 Responda tudo dentro de um unico json válido.
 TXT;
 
@@ -90,7 +112,7 @@ if (!$apiKeyUse) {
 
 // Monta payload da requisição
 $data = [
-    'model' => 'gpt-3.5-turbo',
+    'model' => 'gpt-4o-mini',
     'messages' => [
         ['role' => 'system', 'content' => $mensagemSistema],
         ['role' => 'user', 'content' => $pergunta]
@@ -143,7 +165,7 @@ if (isset($responseData['error'])) {
     exit;
 }
 
-// Caso resposta válida
+// Caso resposta inválida
 if (!isset($responseData['choices'][0]['message']['content'])) {
     log_event("Resposta inválida da OpenAI");
     echo json_encode([

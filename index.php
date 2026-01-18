@@ -1,8 +1,9 @@
 <?php
-require_once 'config/db.php';
+require_once './config/db.php';
+require_once './log_builders/log_access.php';
 
 try {
-  $stmt = $conn->prepare('SELECT * FROM eventos limit 1');
+  $stmt = $conn->prepare('SELECT id FROM eventos limit 1');
 } catch (PDOException $e) {
   echo "Erro: " . $e->getMessage();
 }
@@ -81,8 +82,7 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
       <!-- <h2 class="mb-0">Encontre Eventos Com IA</h2> -->
       <!-- <small class="text-muted">"Sou a IA qual é a boa. Vou te ajudar achar o rolê!"</small> -->
       <div id="chatInput" class="chat-input">
-        <input class="form-control mt-3" type="text" id="userInput"
-          placeholder="Ex: IA, quero curtir samba à noite." />
+        <input class="form-control mt-3" type="text" id="userInput" placeholder="Ex: IA, quero curtir samba à noite." />
         <button class="btn btn-secondary btn-chat col-12 mt-2" onclick="enviarPergunta()">Enviar</button>
       </div>
       <div id="recomendacoesChat" class="recomendacoes-container">
@@ -91,7 +91,8 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
       <p id="explicacaoIA" class="explicacao-chat"></p>
 
     </div>
-    <button class="toggle-btn" onclick="toggleRegiao('chat-area', this)">↑ Use IA para encontrar eventos no dia <?= $dataFormatada ?></button>
+    <button class="toggle-btn" onclick="toggleRegiao('chat-area', this)">↑ Use IA para encontrar eventos no dia
+      <?= $dataFormatada ?></button>
   </div>
   <div id="lightbox" onclick="fecharLightbox()">
     <img id="lightbox-img" src="" alt="Imagem Ampliada" />
@@ -99,7 +100,9 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
   <script>
     const dataFiltro = "<?= $dataFormatada ?>";
-    const eventos = <?= json_encode($eventos) ?>;
+    const eventos = <?= json_encode(value: $eventos) ?>;
+    const eventos_id = eventos.map(ev => ev.id);
+
     let ordemPrioridade = [];
 
     function getFallbackLocation() {
@@ -111,7 +114,7 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
         zoom: 12,
         gestureHandling: "greedy",
         center,
-        mapTypeControll:false,
+        mapTypeControll: false,
         streetViewControl: false,
         zoomControl: true,
       });
@@ -217,7 +220,7 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
       fetch("/api/chat.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pergunta, data, hora, eventos })
+        body: JSON.stringify({ pergunta, data, hora, eventos_id })
       })
         .then(res => res.json())
         .then(data => {
@@ -263,23 +266,23 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
       return agrupados;
     }
 
-function criarSliderEventos(eventos) {
-  if (!eventos.length) return '';
+    function criarSliderEventos(eventos) {
+      if (!eventos.length) return '';
 
-  let slides = eventos.map((ev) => {
-    const imagem = ev.imagem_base64
-      ? `<img src="data:image/png;base64,${ev.imagem_base64}" class="slide-img" onclick="abrirLightbox(this)" style="max-width:70%">`
-      : ev.flyer_imagem
-        ? `<img src="${ev.flyer_imagem}" class="slide-img" onclick="abrirLightbox(this)" />`
-        : ev.flyer_html || '';
+      let slides = eventos.map((ev) => {
+        const imagem = ev.imagem_base64
+          ? `<img src="data:image/png;base64,${ev.imagem_base64}" class="slide-img" onclick="abrirLightbox(this)" style="max-width:70%">`
+          : ev.flyer_imagem
+            ? `<img src="${ev.flyer_imagem}" class="slide-img" onclick="abrirLightbox(this)" />`
+            : ev.flyer_html || '';
 
-    const instagram = ev.linkInstagram
-      ? `<a href="${ev.linkInstagram}" target="_blank">${ev.instagram}</a><br>`
-      : ev.instagram
-        ? `<span>${ev.instagram}</span><br>`
-        : '';
+        const instagram = ev.linkInstagram
+          ? `<a href="${ev.linkInstagram}" target="_blank">${ev.instagram}</a><br>`
+          : ev.instagram
+            ? `<span>${ev.instagram}</span><br>`
+            : '';
 
-    return `
+        return `
       <div class="swiper-slide" style="text-align:center">
         <h3 style="font-size:16px; margin-bottom:10px; white-space: normal; word-break: break-word; margin-right:15px">
           ${ev.titulo}
@@ -288,9 +291,9 @@ function criarSliderEventos(eventos) {
         <div style="margin-top:6px; padding-bottom:5px">${instagram}</div>
       </div>
     `;
-  }).join('');
+      }).join('');
 
-  return `
+      return `
     <div class="swiper-container" style="width: 230px; max-width: 230px;">
       <div class="swiper-wrapper">
         ${slides}
@@ -298,7 +301,7 @@ function criarSliderEventos(eventos) {
       <div class="swiper-pagination" style="margin-top: 5px;"></div>
     </div>
   `;
-}
+    }
 
     function mostrarLocalizacaoComAnimacao(map) {
       if (!navigator.geolocation) return;
@@ -371,6 +374,64 @@ function criarSliderEventos(eventos) {
     function fecharLightbox() {
       document.getElementById('lightbox').style.display = 'none';
     }
+
+    let inicioSessao = Date.now();
+    let localizacaoUsuario = {
+      cidade: "Desconhecida",
+      bairro: "Desconhecido"
+    };
+
+    // Captura localização aproximada (bairro/cidade)
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+
+          try {
+            // OpenStreetMap (gratuito, sem chave)
+            const res = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+            );
+            const data = await res.json();
+
+            localizacaoUsuario.cidade =
+              data.address.city ||
+              data.address.town ||
+              data.address.village ||
+              "Desconhecida";
+
+            localizacaoUsuario.bairro =
+              data.address.suburb ||
+              data.address.neighbourhood ||
+              "Desconhecido";
+          } catch (e) {
+            console.warn("Erro ao resolver localização");
+          }
+        },
+        () => {
+          // Usuário recusou
+        }
+      );
+    }
+
+    // Envia dados ao sair da página
+window.addEventListener("beforeunload", () => {
+  if (sessionStorage.getItem("sessao_logada")) return;
+  sessionStorage.setItem("sessao_logada", "1");
+
+  const payload = {
+    tempo: Math.round((Date.now() - inicioSessao) / 1000),
+    rota: location.pathname + location.search,
+    cidade: localizacaoUsuario.cidade,
+    bairro: localizacaoUsuario.bairro
+  };
+
+  navigator.sendBeacon(
+    "/log_builders/log_sessao.php",
+    JSON.stringify(payload)
+  );
+});
 
   </script>
 
