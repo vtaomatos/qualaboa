@@ -5,7 +5,7 @@
 date_default_timezone_set('America/Sao_Paulo');
 
 $DASH_USER = 'admin';
-$DASH_PASS = '123456';
+$DASH_PASS = '12345677';
 
 require_once __DIR__ . '/config/db.php'; // cria $conn
 
@@ -32,12 +32,10 @@ if (!($_SESSION['dash_auth'] ?? false)) {
     ?>
     <!DOCTYPE html>
     <html>
-
     <head>
         <meta charset="utf-8">
         <title>Login</title>
     </head>
-
     <body style="background:#111;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh">
         <form method="POST" style="background:#222;padding:30px">
             <h3>Dashboard</h3>
@@ -46,14 +44,12 @@ if (!($_SESSION['dash_auth'] ?? false)) {
             <button>Entrar</button>
         </form>
     </body>
-
     </html>
     <?php
     exit;
 }
 
 $host = $_SERVER['HTTP_HOST'] ?? 'unknown';
-
 
 /*************************************
  * LOGS DE ACESSO (ARQUIVO)
@@ -62,7 +58,22 @@ $logsAccess = [];
 foreach (glob($LOG_DIR . 'access_*.log') as $file) {
     $logsAccess = array_merge($logsAccess, file($file, FILE_IGNORE_NEW_LINES));
 }
+
 $totalAcessos = count($logsAccess);
+
+/**
+ * ROTAS — SOMENTE PELOS LOGS DE ACESSO
+ */
+$rotas = [];
+
+foreach ($logsAccess as $linha) {
+    if (preg_match('/Rota:([^|]+)/i', $linha, $m)) {
+        $rota = trim($m[1]);
+        $rotas[$rota] = ($rotas[$rota] ?? 0) + 1;
+    }
+}
+
+arsort($rotas);
 
 /*************************************
  * LOGS DE SESSÃO (BANCO)
@@ -70,41 +81,32 @@ $totalAcessos = count($logsAccess);
 $stmt = $conn->query("
     SELECT
         sessao_id,
-        rota_inicial,
-        ultima_rota,
         duracao_segundos AS tempo_total,
         lat,
         lng
     FROM sessoes
-    WHERE host = " . $conn->quote($host));
+    WHERE host = " . $conn->quote($host)
+);
 
 $sessoes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $totalSessoes = count($sessoes);
 
 /*************************************
- * PROCESSAMENTO
+ * PROCESSAMENTO DE SESSÕES
  *************************************/
 $tempoTotal = 0;
-$rotas = [];
 $heatmap = [];
 
 foreach ($sessoes as $s) {
-    $tempoTotal += (int) $s['tempo_total'];
-
-    $rota_inicial = $s['rota_inicial'] ?: '/';
-    $ultima_rota = $s['ultima_rota'] ?: '/';
-    $rotas[$rota_inicial] = ($rotas[$rota_inicial] ?? 0) + 1;
-    $rotas[$ultima_rota] = ($rotas[$ultima_rota] ?? 0) + 1;
+    $tempoTotal += (int)$s['tempo_total'];
 
     if (!empty($s['lat']) && !empty($s['lng'])) {
         $heatmap[] = [
-            'lat' => (float) $s['lat'],
-            'lng' => (float) $s['lng']
+            'lat' => (float)$s['lat'],
+            'lng' => (float)$s['lng']
         ];
     }
 }
-
-arsort($rotas);
 
 function formatarTempo($segundos) {
     if ($segundos < 60) {
@@ -142,99 +144,64 @@ $tempoMedio = $totalSessoes ? round($tempoTotal / $totalSessoes, 1) : 0;
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <title>Dashboard — Qual a Boa</title>
     <style>
-        body {
-            font-family: Arial;
-            background: #f4f6f8;
-            padding: 20px;
-        }
-
-        .cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-
-        .card {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        td {
-            padding: 6px;
-            border-bottom: 1px solid #eee;
-        }
-
-        #heatmap {
-            height: 500px;
-            margin-top: 20px;
-        }
-
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        body { font-family: Arial; background:#f4f6f8; padding:20px; }
+        .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:15px; }
+        .card { background:#fff; padding:20px; border-radius:8px; }
+        table { width:100%; border-collapse:collapse; }
+        td { padding:6px; border-bottom:1px solid #eee; }
+        #heatmap { height:500px; margin-top:20px; }
+        .topbar { display:flex; justify-content:space-between; align-items:center; }
     </style>
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAfCUegcuOqp8VUDdwJeYt9EoIGh4T0zPs&libraries=visualization"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAfCUegcuOqp8VUDdwJeYt9EoIGh4T0zPs&libraries=visualization"></script>
 </head>
-
 <body>
 
-    <div class="topbar">
-        <h1>📊 Dashboard — Qual a Boa</h1>
-        <a href="?logout=1">🚪 Logout</a>
-    </div>
+<div class="topbar">
+    <h1>📊 Dashboard — Qual a Boa</h1>
+    <a href="?logout=1">🚪 Logout</a>
+</div>
 
-    <div class="cards">
-        <div class="card"><strong>Acessos</strong><br><?= $totalAcessos ?></div>
-        <div class="card"><strong>Sessões</strong><br><?= $totalSessoes ?></div>
-        <div class="card"><strong>Tempo Médio</strong><br><?= formatarTempo($tempoMedio) ?></div>
-    </div>
+<div class="cards">
+    <div class="card"><strong>Acessos</strong><br><?= $totalAcessos ?></div>
+    <div class="card"><strong>Sessões</strong><br><?= $totalSessoes ?></div>
+    <div class="card"><strong>Tempo Médio</strong><br><?= formatarTempo($tempoMedio) ?></div>
+</div>
 
-    <h2>🛣️ Rotas</h2>
-    <table>
-        <?php foreach ($rotas as $r => $v): ?>
-            <tr>
-                <td><?= htmlspecialchars($r) ?></td>
-                <td><?= $v ?></td>
-            </tr>
-        <?php endforeach; ?>
-    </table>
+<h2>🛣️ Rotas (logs de acesso)</h2>
+<table>
+<?php foreach ($rotas as $r => $v): ?>
+    <tr>
+        <td><?= htmlspecialchars($r) ?></td>
+        <td><?= $v ?></td>
+    </tr>
+<?php endforeach; ?>
+</table>
 
-    <h2>🔥 Heatmap</h2>
-    <div id="heatmap"></div>
+<h2>🔥 Heatmap</h2>
+<div id="heatmap"></div>
 
-    <script>
-        const heatmapData = <?= json_encode($heatmap) ?>.map(p =>
-            new google.maps.LatLng(p.lat, p.lng)
-        );
+<script>
+const heatmapData = <?= json_encode($heatmap) ?>.map(p =>
+    new google.maps.LatLng(p.lat, p.lng)
+);
 
-        function initHeatmap() {
-            const map = new google.maps.Map(document.getElementById('heatmap'), {
-                zoom: 12,
-                center: { lat: -23.9608, lng: -46.3331 }
-            });
+function initHeatmap() {
+    const map = new google.maps.Map(document.getElementById('heatmap'), {
+        zoom: 12,
+        center: { lat: -23.9608, lng: -46.3331 }
+    });
 
-            new google.maps.visualization.HeatmapLayer({
-                data: heatmapData,
-                radius: 25
-            }).setMap(map);
-        }
-        window.onload = initHeatmap;
-    </script>
+    new google.maps.visualization.HeatmapLayer({
+        data: heatmapData,
+        radius: 25
+    }).setMap(map);
+}
+window.onload = initHeatmap;
+</script>
 
 </body>
-
 </html>
