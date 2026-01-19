@@ -1,6 +1,16 @@
 <?php
 require_once __DIR__ . '/../config/db.php';
 
+$headers = getallheaders();
+
+$isPrefetch =
+    isset($headers['Purpose']) && $headers['Purpose'] === 'prefetch'
+    || isset($headers['Sec-Purpose']) && $headers['Sec-Purpose'] === 'prefetch';
+
+if ($isPrefetch) {
+    return;
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     exit;

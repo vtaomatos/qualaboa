@@ -162,7 +162,7 @@ $tempoMedio = $totalSessoes ? round($tempoTotal / $totalSessoes, 1) : 0;
 
 <div class="topbar">
     <h1>📊 Dashboard — Qual a Boa</h1>
-    <a href="?logout=1">🚪 Logout</a>
+    <a href="?logout=1" style="text-decoration:none">🚪 Logout</a>
 </div>
 
 <div class="cards">

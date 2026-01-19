@@ -1,6 +1,5 @@
 <?php
 require_once './config/db.php';
-require_once './log_builders/log_access.php';
 
 try {
   $stmt = $conn->prepare('SELECT id FROM eventos limit 1');
@@ -326,16 +325,17 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
     `;
     }
 
-    
     /* ===============================
-       LOG DE SESSÃO (CORRIGIDO)
+       LOG DE SESSÃO E ACESSO (PROGRESSIVO)
     =============================== */
+
+    let sessaoConfirmada = false;
+    let acessoRegistrado = false;
+    let tempoSessao = 0; // em segundos
+    let ultimoHeartbeat = Date.now();
 
     const sessao_id = sessionStorage.getItem("sessao_id") || crypto.randomUUID();
     sessionStorage.setItem("sessao_id", sessao_id);
-
-    const HEARTBEAT_INTERVAL = 60000;
-    let ultimoHeartbeat = Date.now();
 
     let localizacaoUsuario = getFallbackLocation();
 
@@ -352,6 +352,7 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
       const agora = Date.now();
       const delta = Math.round((agora - ultimoHeartbeat) / 1000);
       ultimoHeartbeat = agora;
+      tempoSessao += delta;
 
       navigator.sendBeacon("/log_builders/log_sessao.php", JSON.stringify({
         evento,
@@ -361,22 +362,85 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
         lat: localizacaoUsuario.lat,
         lng: localizacaoUsuario.lng
       }));
+
+      return delta;
     }
 
-    if (!sessionStorage.getItem("sessao_start")) {
-      enviarLogSessao("start");
-      sessionStorage.setItem("sessao_start", "1");
+    function registrarAcesso() {
+      if (acessoRegistrado) return;
+      acessoRegistrado = true;
+
+      fetch('/log_builders/log_access.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tipo: 'user_interaction',
+          page: window.location.pathname + location.search,
+          sessao_id,
+          ts: Date.now()
+        })
+      });
+
+      removerListenersIniciais();
     }
 
-    window.__heartbeatTimer = setInterval(() => {
+    function iniciarSessaoSeNecessario() {
+      if (sessaoConfirmada) return;
+      sessaoConfirmada = true;
+
+      if (!sessionStorage.getItem("sessao_start")) {
+        enviarLogSessao("start");
+        sessionStorage.setItem("sessao_start", "1");
+      }
+
+      heartbeatProgressivo();
+      registrarAcesso(); // dispara acesso junto na primeira interação
+      removerListenersIniciais();
+    }
+
+    function heartbeatProgressivo() {
       enviarLogSessao("heartbeat");
-    }, HEARTBEAT_INTERVAL);
 
+      let proximoIntervalo;
+
+      if (tempoSessao < 60) {            // 0-1 min → 5s
+        proximoIntervalo = 5000;
+      } else if (tempoSessao < 180) {    // 1-3 min → 15s
+        proximoIntervalo = 15000;
+      } else if (tempoSessao < 600) {    // 3-10 min → 30s
+        proximoIntervalo = 30000;
+      } else {                            // 10min+ → 1min
+        proximoIntervalo = 60000;
+      }
+
+      setTimeout(heartbeatProgressivo, proximoIntervalo);
+    }
+
+    function removerListenersIniciais() {
+      ["click", "scroll", "keydown", "touchstart"].forEach(e =>
+        window.removeEventListener(e, iniciarSessaoSeNecessario)
+      );
+      ["click", "scroll", "keydown", "touchstart"].forEach(e =>
+        window.removeEventListener(e, registrarAcesso)
+      );
+    }
+
+    // inicializa sessão e acesso **apenas após ação do usuário**
+    ["click", "scroll", "keydown", "touchstart"].forEach(e =>
+      window.addEventListener(e, iniciarSessaoSeNecessario, { once: true })
+    );
+    ["click", "scroll", "keydown", "touchstart"].forEach(e =>
+      window.addEventListener(e, registrarAcesso, { once: true })
+    );
+
+    // encerra heartbeat e registra "end" ao sair da página
     window.addEventListener("beforeunload", () => {
-      clearInterval(window.__heartbeatTimer);
       enviarLogSessao("end");
     });
 
+    /* ===============================
+       LIGHTBOX
+    =============================== */
     window.abrirLightbox = function (img) {
       document.getElementById('lightbox-img').src = img.src;
       document.getElementById('lightbox').style.display = 'flex';
@@ -386,6 +450,7 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
       document.getElementById('lightbox').style.display = 'none';
     };
   </script>
+
 
 
 
