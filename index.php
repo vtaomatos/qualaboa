@@ -132,8 +132,6 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
       });
     }
 
-
-
     function getTamanhoPorPrioridade(id) {
       const index = ordemPrioridade.findIndex(item => parseInt(item) === parseInt(id));
       if (index === 0) return 50;
@@ -141,7 +139,6 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
       if (index === 2) return 35;
       return 30;
     }
-
 
     function adicionarEventoNoMapa(map, evento) {
       const infoContent = criarInfoWindow(evento);
@@ -160,8 +157,43 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
         infoWindow.open(map, marker);
         map.panBy(0, -250);
         google.maps.event.addListenerOnce(infoWindow, 'closeclick', () => {
-          map.panBy(0, 250); // Reverte o deslocamento
+          map.panBy(0, 250);
         });
+      });
+    }
+
+    function mostrarLocalizacaoComAnimacao(map) {
+      if (!navigator.geolocation) return;
+
+      navigator.geolocation.getCurrentPosition((pos) => {
+        const userLoc = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        };
+
+        const circulo = new google.maps.Circle({
+          strokeColor: "#1E90FF",
+          strokeOpacity: 0.6,
+          strokeWeight: 2,
+          fillColor: "#1E90FF",
+          fillOpacity: 0.2,
+          map,
+          center: userLoc,
+          radius: pos.coords.accuracy || 50,
+        });
+
+        map.setCenter(userLoc);
+
+        let growing = true;
+        let currentRadius = circulo.getRadius();
+
+        setInterval(() => {
+          currentRadius += growing ? 5 : -5;
+          circulo.setRadius(currentRadius);
+
+          if (currentRadius >= (pos.coords.accuracy + 30)) growing = false;
+          if (currentRadius <= pos.coords.accuracy) growing = true;
+        }, 80);
       });
     }
 
@@ -194,10 +226,7 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
           google.maps.event.addListenerOnce(infoWindow, 'domready', () => {
             new Swiper('.swiper-container', {
-              pagination: {
-                el: '.swiper-pagination',
-                clickable: true,
-              },
+              pagination: { el: '.swiper-pagination', clickable: true },
             });
           });
 
@@ -228,20 +257,14 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
           try {
             resposta = JSON.parse(data.resposta);
             resposta.ordem = (resposta.ordem || []).map(id => parseInt(id));
-          } catch (e) {
-            erro = data?.erro + "<br>" + data?.codigo;
-            resposta = {
-              ordem: [],
-              explicacao: data.resposta || erro || "Resposta em formato inesperado"
-            };
+          } catch {
+            resposta = { ordem: [], explicacao: data.resposta };
           }
 
           ordemPrioridade = resposta.ordem || [];
-          document.getElementById("explicacaoIA").innerHTML = resposta.explicacao || "Sem resposta da IA";
-
+          document.getElementById("explicacaoIA").innerHTML = resposta.explicacao || "";
           document.getElementById("recomendacoesChat").innerHTML = "";
           initMap();
-
           document.scrollingElement.scrollTo(0, 999999);
         });
     }
@@ -250,9 +273,11 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
       const regiao = document.getElementById(regiaoId);
       const colapsada = regiao.classList.toggle('regiao-colapsada');
 
-      const mostrarTexto = regiaoId === 'chat-area' ? `↑ Use IA para encontrar eventos no dia ${dataFiltro}` : `↓ Encontre eventos na sua região por data: ${dataFiltro}`;
-      const ocultarTexto = regiaoId === 'chat-area' ? '↓ Ocultar' : '↑ Ocultar';
+      const mostrarTexto = regiaoId === 'chat-area'
+        ? `↑ Use IA para encontrar eventos no dia ${dataFiltro}`
+        : `↓ Encontre eventos na sua região por data: ${dataFiltro}`;
 
+      const ocultarTexto = regiaoId === 'chat-area' ? '↓ Ocultar' : '↑ Ocultar';
       btn.innerHTML = colapsada ? mostrarTexto : ocultarTexto;
     }
 
@@ -283,157 +308,86 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
             : '';
 
         return `
-      <div class="swiper-slide" style="text-align:center">
-        <h3 style="font-size:16px; margin-bottom:10px; white-space: normal; word-break: break-word; margin-right:15px">
-          ${ev.titulo}
-        </h3>
-        ${imagem}
-        <div style="margin-top:6px; padding-bottom:5px">${instagram}</div>
-      </div>
-    `;
+        <div class="swiper-slide" style="text-align:center">
+          <h3 style="font-size:16px; margin-bottom:10px; white-space: normal; word-break: break-word; margin-right:15px">
+            ${ev.titulo}
+          </h3>
+          ${imagem}
+          <div style="margin-top:6px; padding-bottom:5px">${instagram}</div>
+        </div>
+      `;
       }).join('');
 
       return `
-    <div class="swiper-container" style="width: 230px; max-width: 230px;">
-      <div class="swiper-wrapper">
-        ${slides}
+      <div class="swiper-container" style="width: 230px; max-width: 230px;">
+        <div class="swiper-wrapper">${slides}</div>
+        <div class="swiper-pagination" style="margin-top: 5px;"></div>
       </div>
-      <div class="swiper-pagination" style="margin-top: 5px;"></div>
-    </div>
-  `;
+    `;
     }
 
-    function mostrarLocalizacaoComAnimacao(map) {
-      if (!navigator.geolocation) return;
+    
+    /* ===============================
+       LOG DE SESSÃO (CORRIGIDO)
+    =============================== */
 
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const userLoc = {
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude,
-          };
+    const sessao_id = sessionStorage.getItem("sessao_id") || crypto.randomUUID();
+    sessionStorage.setItem("sessao_id", sessao_id);
 
-          const circulo = new google.maps.Circle({
-            strokeColor: "#1E90FF",
-            strokeOpacity: 0.6,
-            strokeWeight: 2,
-            fillColor: "#1E90FF",
-            fillOpacity: 0.2,
-            map: map,
-            center: userLoc,
-            radius: pos.coords.accuracy || 50,
-          });
+    const HEARTBEAT_INTERVAL = 60000;
+    let ultimoHeartbeat = Date.now();
 
-          map.setCenter(userLoc);
+    let localizacaoUsuario = getFallbackLocation();
 
-          let growing = true;
-          let currentRadius = circulo.getRadius();
-
-          setInterval(() => {
-            currentRadius += growing ? 5 : -5;
-            circulo.setRadius(currentRadius);
-
-            if (currentRadius >= (pos.coords.accuracy + 30)) growing = false;
-            if (currentRadius <= pos.coords.accuracy) growing = true;
-          }, 80);
-        },
-        (err) => {
-          console.warn("Erro ao obter localização:", err.message);
-        }
-      );
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(pos => {
+        localizacaoUsuario = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude
+        };
+      });
     }
 
+    function enviarLogSessao(evento) {
+      const agora = Date.now();
+      const delta = Math.round((agora - ultimoHeartbeat) / 1000);
+      ultimoHeartbeat = agora;
 
+      navigator.sendBeacon("/log_builders/log_sessao.php", JSON.stringify({
+        evento,
+        sessao_id,
+        tempo: delta,
+        rota: location.pathname + location.search,
+        lat: localizacaoUsuario.lat,
+        lng: localizacaoUsuario.lng
+      }));
+    }
 
-    marker.addListener("click", () => {
-      const key = `${parseFloat(evento.latitude).toFixed(5)}_${parseFloat(evento.longitude).toFixed(5)}`;
-      const eventosDoLocal = eventosAgrupados[key] || [];
+    if (!sessionStorage.getItem("sessao_start")) {
+      enviarLogSessao("start");
+      sessionStorage.setItem("sessao_start", "1");
+    }
 
-      const infoWindowContent = criarSliderEventos(eventosDoLocal);
-      infoWindow.setContent(infoWindowContent);
-      infoWindow.open(map, marker);
-      map.panBy(0, -250);
+    window.__heartbeatTimer = setInterval(() => {
+      enviarLogSessao("heartbeat");
+    }, HEARTBEAT_INTERVAL);
 
-      google.maps.event.addListenerOnce(infoWindow, 'domready', () => {
-        new Swiper('.swiper-container', {
-          pagination: { el: '.swiper-pagination', clickable: true },
-        });
-      });
-
-      google.maps.event.addListenerOnce(infoWindow, 'closeclick', () => {
-        map.panBy(0, 250);
-      });
+    window.addEventListener("beforeunload", () => {
+      clearInterval(window.__heartbeatTimer);
+      enviarLogSessao("end");
     });
 
-
-    function abrirLightbox(imgElement) {
-      document.getElementById('lightbox-img').src = imgElement.src;
+    window.abrirLightbox = function (img) {
+      document.getElementById('lightbox-img').src = img.src;
       document.getElementById('lightbox').style.display = 'flex';
-    }
-
-    function fecharLightbox() {
-      document.getElementById('lightbox').style.display = 'none';
-    }
-
-    let inicioSessao = Date.now();
-    let localizacaoUsuario = {
-      cidade: "Desconhecida",
-      bairro: "Desconhecido"
     };
 
-    // Captura localização aproximada (bairro/cidade)
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (pos) => {
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
-
-          try {
-            // OpenStreetMap (gratuito, sem chave)
-            const res = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
-            );
-            const data = await res.json();
-
-            localizacaoUsuario.cidade =
-              data.address.city ||
-              data.address.town ||
-              data.address.village ||
-              "Desconhecida";
-
-            localizacaoUsuario.bairro =
-              data.address.suburb ||
-              data.address.neighbourhood ||
-              "Desconhecido";
-          } catch (e) {
-            console.warn("Erro ao resolver localização");
-          }
-        },
-        () => {
-          // Usuário recusou
-        }
-      );
-    }
-
-    // Envia dados ao sair da página
-window.addEventListener("beforeunload", () => {
-  if (sessionStorage.getItem("sessao_logada")) return;
-  sessionStorage.setItem("sessao_logada", "1");
-
-  const payload = {
-    tempo: Math.round((Date.now() - inicioSessao) / 1000),
-    rota: location.pathname + location.search,
-    cidade: localizacaoUsuario.cidade,
-    bairro: localizacaoUsuario.bairro
-  };
-
-  navigator.sendBeacon(
-    "/log_builders/log_sessao.php",
-    JSON.stringify(payload)
-  );
-});
-
+    window.fecharLightbox = function () {
+      document.getElementById('lightbox').style.display = 'none';
+    };
   </script>
+
+
 
   <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAfCUegcuOqp8VUDdwJeYt9EoIGh4T0zPs&callback=initMap"></script>

@@ -1,58 +1,126 @@
 <?php
-// api/log_sessao.php
+require_once __DIR__ . '/../config/db.php';
 
-// Aceita apenas POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     exit;
 }
 
-// Lê JSON bruto
-$raw = file_get_contents("php://input");
-$data = json_decode($raw, true);
-
-if (!$data) {
+$data = json_decode(file_get_contents('php://input'), true);
+if (!$data || empty($data['sessao_id'])) {
     http_response_code(400);
     exit;
 }
 
-// Dados recebidos
-$evento = $data['evento'] ?? 'heartbeat';
-$tempo  = intval($data['tempo'] ?? 0);
-$rota   = substr($data['rota'] ?? '/', 0, 255);
+$sessaoId = substr($data['sessao_id'], 0, 64);
+$evento   = $data['evento'] ?? 'heartbeat';
+$tempo    = intval($data['tempo'] ?? 0);
+$rota     = substr($data['rota'] ?? '/', 0, 255);
 
-// Sanitização básica
-$cidade = preg_replace('/[^a-zA-ZÀ-ú ]/', '', $data['cidade'] ?? 'Desconhecida');
-$bairro = preg_replace('/[^a-zA-ZÀ-ú ]/', '', $data['bairro'] ?? 'Desconhecido');
+$lat = isset($data['lat']) ? floatval($data['lat']) : null;
+$lng = isset($data['lng']) ? floatval($data['lng']) : null;
 
-// Infos do request
-$ip  = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-$ua  = substr($_SERVER['HTTP_USER_AGENT'] ?? 'Unknown', 0, 255);
-$hora = date('Y-m-d H:i:s');
+// fallback Santos
+$fallbackLat = -23.9608;
+$fallbackLng = -46.3331;
 
-// Pasta de logs
-$dir = __DIR__ . '/../logs/';
-if (!is_dir($dir)) {
-    mkdir($dir, 0777, true);
+// ignora fallback
+if ($lat === $fallbackLat && $lng === $fallbackLng) {
+    $lat = null;
+    $lng = null;
 }
 
-// Arquivo diário
-$arquivo = $dir . 'sessao_' . date('Y-m-d') . '.log';
+$ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+$ua = substr($_SERVER['HTTP_USER_AGENT'] ?? 'Unknown', 0, 255);
+$agora = date('Y-m-d H:i:s');
 
-// Formato padronizado (1 linha = 1 evento)
-$linha = implode(' | ', [
-    $hora,
-    "EV:$evento",
-    "IP:$ip",
-    "Cidade:$cidade",
-    "Bairro:$bairro",
-    "Tempo:$tempo"."s",
-    "Rota:$rota",
-    "UA:$ua"
-]) . "\n";
+/**
+ * Verifica se sessão já existe
+ */
+$stmt = $conn->prepare("
+    SELECT id, lat, lng
+    FROM sessoes
+    WHERE sessao_id = ?
+");
+$stmt->execute([$sessaoId]);
+$sessao = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// Grava
-file_put_contents($arquivo, $linha, FILE_APPEND | LOCK_EX);
+if (!$sessao) {
+    $host = $_SERVER['HTTP_HOST'] ?? 'unknown';
 
-// Resposta mínima
+
+    // ==========================
+    // INSERT NOVA SESSÃO
+    // ==========================
+    $stmt = $conn->prepare("
+        INSERT INTO sessoes (
+            sessao_id,
+            ip,
+            user_agent,
+            inicio,
+            ultimo_evento,
+            duracao_segundos,
+            heartbeats,
+            lat,
+            lng,
+            rota_inicial,
+            ultima_rota,
+            encerrada,
+            host
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)
+    ");
+
+    $stmt->execute([
+        $sessaoId,
+        $ip,
+        $ua,
+        $agora,
+        $agora,
+        $tempo,
+        1,
+        $lat,
+        $lng,
+        $rota,
+        $rota,
+        $host
+    ]);
+
+} else {
+
+    // ==========================
+    // UPDATE SESSÃO EXISTENTE
+    // ==========================
+    $sql = "
+        UPDATE sessoes SET
+            ultimo_evento = ?,
+            duracao_segundos = duracao_segundos + ?,
+            heartbeats = heartbeats + 1,
+            ultima_rota = ?
+    ";
+
+    $params = [
+        $agora,
+        $tempo,
+        $rota
+    ];
+
+    // só atualiza coordenadas se não forem null
+    if ($lat !== null && $lng !== null) {
+        $sql .= ", lat = ?, lng = ?";
+        $params[] = $lat;
+        $params[] = $lng;
+    }
+
+    if ($evento === 'end') {
+        $sql .= ", encerrada = 1";
+    }
+
+    $sql .= " WHERE sessao_id = ?";
+
+    $params[] = $sessaoId;
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute($params);
+}
+
 http_response_code(204);

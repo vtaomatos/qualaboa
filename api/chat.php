@@ -9,7 +9,7 @@ if (!empty($_SERVER['RATE_LIMIT_EXCEEDED'])) {
         'resposta' => json_encode([
             'ordem' => [],
             // 'explicacao' => '⚠️ Muitas requisições. Aguarde um pouco antes de tentar novamente.'
-            'explicacao' => '⚠️ Você atingiu seu limite de 5 prompts gratuitos do dia.'
+            'explicacao' => '⚠️ Você já atingiu seu limite de 5 prompts gratuitos do dia.'
         ])
     ]);
     exit;
