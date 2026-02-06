@@ -1,36 +1,81 @@
-#regiao-2 #map {
-  height: 100vh;
-}
-h2{
-  color: #209CEE;
+/* =========================
+   RESET E FONTES
+========================= */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: #ffffff;
+  color: #333;
 }
 
-#regiao-3{
-  background-color: #f1f9ff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+/* =========================
+   MAPA
+========================= */
+#margin-mapa {
+  height: 10vh;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+#map {
+  width: 100%;
+  height: 79vh;
+  margin: 0 !important;
+  margin-top: 1vh !important;
+  padding: 0;
+  border:0;
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04)
-}
-
- form {
-  display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
-  background: #ffffff;
-  padding: 1rem 0;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-} 
-
-.regiao-colapsada {
-  display: none;
   overflow: hidden;
-  transition: max-height 0.4s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
+/* =========================
+   TOPO FIXO
+========================= */
+.fixo-topo {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  padding: 1rem 0.5rem;
+  background: #f1f9ff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+  transition: transform 0.3s ease-in-out;
+  min-height: 10vh;
+}
+
+.fixo-topo.regiao-colapsada {
+  transform: translateY(-100%);
+  padding-top: 100px;
+}
+
+/* =========================
+   RODAPÉ FIXO
+========================= */
+.fixo-rodape {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 1rem;
+  background: #fff;
+  border-top: 1px solid #ccc;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+  transition: transform 0.3s ease-in-out;
+  min-height: 10vh !important;
+}
+
+.fixo-rodape.regiao-colapsada {
+  transform: translateY(100%);
+}
+
+/* =========================
+   BOTÕES TOGGLE
+========================= */
 .toggle-btn {
   background: none;
   border: none;
@@ -39,129 +84,67 @@ h2{
   cursor: pointer;
   margin: 0 auto;
   display: block;
+  transition: color 0.2s;
 }
 
-.toggle-btn:hover {
-  color: #0056b3;
-}
-
-.fixo-rodape {
+/* =========================
+   FILTROS
+========================= */
+#filtro-categorias {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
+  top: 10vh;
+  right: 0.5vw;
+  width: 20vw;
+  z-index: 998;
   background: #fff;
-  padding: 1rem;
-  border-top: 1px solid #ccc;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
-  z-index: 999;
-  transition: transform 0.3s ease-in-out;
+  padding: 0.75rem;
+  border-radius: 10px;
+  margin: 0;
+  border: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-.fixo-rodape.regiao-colapsada {
-  transform: translateY(100%);
-}
-
-.fixo-topo {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  background: #fff;
-  padding: 1rem 0.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  z-index: 999;
-  transition: transform 0.3s ease-in-out;
-}
-
-.fixo-topo.regiao-colapsada {
-  transform: translateY(-100%);
-}
-
-.gm-style-iw-ch, .gm-style-iw-chr{
-  height: 20px;
-  max-height: 20px;
-  overflow: visible;
-}
-
+/* =========================
+   LIGHTBOX
+========================= */
 #lightbox {
   display: none;
   position: fixed;
-  top:0; left:0; width:100%; height:100%;
-  background: rgba(0,0,0,0.8);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
   justify-content: center;
   align-items: center;
   z-index: 9999;
 }
+
 #lightbox img {
   max-width: 90%;
   max-height: 90%;
-}
-.gm-style-iw {
-  max-width: 250px !important;
-  max-height: 400px !important;
-  overflow: hidden !important;
-  padding: 0 !important;
-}
-
-.slide-img {
-  max-width: 90%;
   border-radius: 6px;
-  cursor: pointer;
 }
 
-.gm-ui-hover-effect{
-  z-index: 10;
+/* =========================
+   REGIÕES COLAPSADAS
+========================= */
+.regiao-colapsada {
+  display: none;
+  overflow: hidden;
+  transition: max-height 0.4s ease, transform 0.3s ease-in-out;
 }
 
-/*
-
-.btn-buscar{
-  width: 100%;
-  margin-top: 2rem;
-}
-
-#userInput{
-  width: 100%;
-  border: 1px solid #209CEE;
-  border-radius: 6px;
-  margin-right: 0.5rem;
-  outline: none;
-}
-
-.btn-chat{
-  width:100%;
-  margin-top:2rem;
-}
-
-.chat-input{
-  margin-top:2rem;
-}
- */
-/* body {
-  font-family: 'Inter', sans-serif;
-  background-color: #ffffff;
-  margin: 0;
-  padding: 1rem;
-  color: #333;
-}
-
-h1, h2 {
-  text-align: center;
-  color: #209CEE;
-  margin: 0.5rem 0 1rem;
-}
-
+/* =========================
+   FORMULÁRIOS
+========================= */
 form {
   display: flex;
-  justify-content: center;
-  gap: 0.75rem;
-  margin: 1rem auto;
+  justify-content: space-around;
   flex-wrap: wrap;
-  max-width: 800px;
-  background: #f1f9ff;
+  background: #ffffff;
   padding: 1rem 1.25rem;
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  max-width: 800px;
+  margin: 1rem auto;
 }
 
 label {
@@ -173,15 +156,16 @@ label {
 }
 
 input[type="date"],
-input[type="time"] {
+input[type="time"],
+input[type="text"] {
   padding: 0.5rem;
   border: 1px solid #209CEE;
   border-radius: 6px;
   outline: none;
+  transition: border-color 0.2s;
 }
 
-input[type="date"]:focus,
-input[type="time"]:focus {
+input:focus {
   border-color: #126fb2;
 }
 
@@ -196,50 +180,15 @@ button {
   transition: background-color 0.3s;
 }
 
-button:hover {
-  background-color: #126fb2;
-}
-
-#map {
-  height: 360px;
-  width: 100%;
-  max-width: 1000px;
-  margin: 0.75rem auto;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-
-.chat-area {
-  max-width: 1000px;
-  margin: auto;
-  padding: 1rem;
-  background-color: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  margin-bottom:0;
-  padding-bottom:0;
-}
-
-#userInput {
-  width: 70%;
-  padding: 0.5rem;
-  font-size: 1rem;
-  border: 1px solid #209CEE;
-  border-radius: 6px;
-  margin-right: 0.5rem;
-  outline: none;
-}
-
-#userInput:focus {
-  border-color: #126fb2;
-}
-
+/* =========================
+   EVENTOS / CARDS
+========================= */
 .recomendacoes-container {
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
   margin-top: 1rem;
+  justify-content: center;
 }
 
 .evento-card {
@@ -248,7 +197,8 @@ button:hover {
   border-radius: 10px;
   transition: transform 0.3s;
   flex: 1 1 220px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
 }
 
 .evento-card.destacado-1 {
@@ -261,59 +211,133 @@ button:hover {
   background-color: #f0fbff;
 }
 
-.explicacao-chat {
-  margin-top: 0.5rem;
-  font-style: italic;
-  color: #666;
+#map .gm-style-iw-ch, #map .gm-style-iw-chr {
+  max-height: 0px;
+  overflow:visible;
 }
 
-#regiao-1,
-#regiao-2 {
-  padding: 0.75rem;
+
+#map button[aria-label="Fechar"] {
+  min-height: 48px;
+  min-width: 48px;
+  z-index: 10;
+  background-color: #fff !important;
 }
 
-#regiao-2 #map {
-  height: 50vh;
+#map .gm-style-iw-d {
+  max-height: none !important;
+  padding-bottom: 20px !important;
 }
 
-#regiao-1{
-  padding-bottom:0;
+#map [role="dialog"] {
+  max-height: none !important;
 }
 
-#regiao-2{
-  padding-top:0;
+/* Só pra não exibir muito pequeno enquanto carrega a imagem */
+/* #map .flyer-wrapper{
+  min-height: 300px;
+} */
+
+/* =========================
+   OUTROS
+========================= */
+h1,
+h2 {
+  text-align: center;
+  color: #209CEE;
+  margin: 0.5rem 0 1rem;
 }
 
-#chatInput{
+#regiao-3 {
+  background-color: #f1f9ff;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-top: 0.5rem;
-  padding:auto;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  padding: 1vh;
+  border:0;
 }
 
+.slide-img {
+  max-width: 90%;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* =========================
+   SPINNER DE CARREGAMENTO
+========================= */
+
+.flyer-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 180px;
+  gap: 8px;
+  color: #666;
+  font-size: 13px;
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid #ddd;
+  border-top-color: #333;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.hidden {
+  display: none;
+}
+
+/* =========================
+   CHAT
+========================= */
+
+#explicacaoIA{
+  max-height: 200px;
+  overflow-y: scroll;
+  scrollbar-color: rgba(0,0,0,.5) transparent;
+  scrollbar-width: thin;
+}
+
+
+
+/* =========================
+   RESPONSIVIDADE
+========================= */
 @media (max-width: 768px) {
   form {
     flex-direction: column;
     align-items: stretch;
   }
 
-  input {
-    width: 100%;
-    margin-bottom: 0.5rem;
-    padding: 0.5rem 1rem;
-  }
-
+  input,
   button {
     width: 100%;
+    margin-bottom: 0.5rem;
   }
 
   .recomendacoes-container {
     flex-direction: column;
+    gap: 1rem;
   }
 
-  #chatInput{
+  #chatInput {
     flex-direction: column;
   }
+
+  #filtro-categorias {
+    width: 90%;
+    right: 5%;
+    top: 100px;
+  }
 }
- */

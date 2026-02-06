@@ -88,11 +88,11 @@ log_event("Lista formatada de eventos para IA:\n" . $listaEventosTexto);
 
 // Prompt da IA
 $mensagemSistema = <<<TXT
-Você é uma IA que vai ajudar a encontrar os melhores eventos que você tem conhecimento disponível no app ou certeza fora dele.
+Você é uma IA que vai ajudar a encontrar os melhores eventos com base no prompt do usuário.
 Com base nessa lista de eventos, responda com um json de duas partes;
-A primeira parte do json vai conter todos os ids dos eventos em ordem de relevância para o prompt do usuário;
-A segunda parte do json vai ser um texto html explicando suas considerações.
-Ex: {"ordem": [1, 2, 3], "explicacao": "Humm vai rolar o evento tal que pode ser essa pegada..."}
+Ex do json total: {"ordem": [1, 2, 3], "explicacao": "Humm vai rolar o evento tal que pode ser essa pegada...(resultados em lista html e localização dos eventos)"}
+A primeira parte (ordem) do json vai conter todos os ids dos eventos em ordem de relevância para o prompt do usuário;
+A segunda parte do json (explicação) vai ser um texto html explicando suas considerações.
 Se não houver eventos na lista, responda com a primeira parte obj vazio e segunda "Nada encontrado".
 Se o usuário fugir do assunto, lembre-o educadamente que você só pode ajudar a encontrar eventos.
 Lista de eventos disponíveis:
@@ -101,6 +101,8 @@ Responda de forma amigável e com base no interesse do usuário como um agente d
 O usuário pode te mandar prompts como "Balada boa hoje?" ou coisa do tipo, o ajude a identificar quais eventos são baladas e indique o melhor possivel
 Também pode mandar "Jantar a dois" O ajude a encontrar o melhor ambiente calmo para jantar a dois.
 Responda tudo dentro de um unico json válido.
+Glossario: pagode + sertanejo = pagonejo; funk + sertanejo = funknejo; pagode + funk = pagofunk.
+Não absolutamente nada fora da json solicitada, sem aspas e sem nenhum caractere fora das chaves.
 TXT;
 
 $apiKeyUse = APIKEY ?: '';
@@ -175,5 +177,8 @@ if (!isset($responseData['choices'][0]['message']['content'])) {
     exit;
 }
 
+//vamos tratar json invalido no content da resposta
+$content = $responseData['choices'][0]['message']['content'] ?? '{}';
+$content = preg_replace('/```(?:json)?\s*(.*?)```/s', '$1', $content);
 
-echo json_encode(['resposta' => $responseData['choices'][0]['message']['content']]);
+echo json_encode(['resposta' => $content]);
