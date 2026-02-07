@@ -181,6 +181,10 @@ function normalizarCategoria(?string $categoria): string
             <li>Veja onde está acontecendo</li>
             <li>Use a IA para descobrir rolês do seu estilo</li>
           </ul>
+          <p class="mt-3 text-center text-muted small">
+            O sistema está em construção 🚧 e a IA está aprendendo. <br>
+            Obrigado pela paciência! 😅
+          </p>
           <p class="mb-0">
             Ao continuar, vamos pedir sua localização para mostrar eventos próximos de você.
           </p>
@@ -220,7 +224,7 @@ function normalizarCategoria(?string $categoria): string
         <?php foreach ($categoriasSelecionadas as $cat): ?>
           <div class="form-check">
             <input id="categoria-<?= $cat ?>" class="form-check-input filtro-categoria" type="checkbox"
-              value="<?= $cat ?>" >
+              value="<?= $cat ?>">
             <label class="form-check-label" for="categoria-<?= $cat ?>"><?= $cat ?></label>
           </div>
         <?php endforeach; ?>
