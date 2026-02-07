@@ -521,6 +521,40 @@ function normalizarCategoria(?string $categoria): string
         });
     }
 
+    function criarBotaoFechar(infoWindow, map) {
+      // Cria o botão
+      const btnFechar = document.createElement('button');
+      btnFechar.textContent = 'X';
+      btnFechar.style.position = 'absolute';
+      btnFechar.style.top = '10px';
+      btnFechar.style.right = '10px';
+      btnFechar.style.width = '36px';
+      btnFechar.style.height = '36px';
+      btnFechar.style.border = 'none';
+      btnFechar.style.borderRadius = '50%';
+      btnFechar.style.background = 'rgba(255,255,255,0.5)';
+      btnFechar.style.cursor = 'pointer';
+      btnFechar.style.zIndex = '1000';
+      btnFechar.style.fontSize = '20px';
+      btnFechar.style.lineHeight = '36px';
+      btnFechar.style.textAlign = 'center';
+      btnFechar.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
+      btnFechar.style.color = '#444';
+      //margin 0
+      //padding 0
+      btnFechar.style.margin = '0';
+      btnFechar.style.padding = '0';
+
+      // Fecha o InfoWindow ao clicar
+      btnFechar.addEventListener('click', () => {
+        infoWindow.close();
+        map.panBy(0, 250); // Ajusta o mapa se necessário
+      });
+
+      return btnFechar;
+    }
+
+
     // =================== Inicializar mapa ===================
     function initMap() {
       if (!map) map = criarMapa(getFallbackLocation());
@@ -547,12 +581,26 @@ function normalizarCategoria(?string $categoria): string
           infoWindow.setContent(criarSliderEventos(eventosDoLocal));
           infoWindow.open(map, marker);
           map.panBy(0, -250);
+
           google.maps.event.addListenerOnce(infoWindow, 'domready', () => {
+            // Inicializa o swiper
             new Swiper('.swiper-container', { pagination: { el: '.swiper-pagination', clickable: true } });
             carregarImagensEventos(eventosDoLocal);
+
+            // Cria o botão e adiciona dentro do InfoWindow
+            const iwContainer = document.querySelector('#map .gm-style-iw-ch, #map .gm-style-iw-chr');
+            if (iwContainer && !iwContainer.querySelector('.custom-close-btn')) {
+              const btn = criarBotaoFechar(infoWindow, map);
+              btn.classList.add('custom-close-btn'); // só pra garantir que não duplica
+              iwContainer.appendChild(btn);
+            }
           });
-          google.maps.event.addListenerOnce(infoWindow, 'closeclick', () => { map.panBy(0, 250); });
+
+          google.maps.event.addListenerOnce(infoWindow, 'closeclick', () => {
+            map.panBy(0, 250);
+          });
         });
+
       });
     }
 

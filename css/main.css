@@ -219,6 +219,7 @@ button {
 
 
 #map button[aria-label="Fechar"] {
+  display: none !important;
   min-height: 48px;
   min-width: 48px;
   z-index: 10;
@@ -228,10 +229,12 @@ button {
 #map .gm-style-iw-d {
   max-height: none !important;
   padding-bottom: 20px !important;
+  
 }
 
 #map [role="dialog"] {
   max-height: none !important;
+  min-width: 247px !important;
 }
 
 /* Só pra não exibir muito pequeno enquanto carrega a imagem */
@@ -352,162 +355,170 @@ h2 {
     left: 50px;
     width: 375px;
   }
+
+  #map button[aria-label="Fechar"] {
+    display: none  !important;
+    min-height: 48px;
+    min-width: 48px;
+    z-index: 10;
+    background-color: #fff !important;
+  }
 }
 
-  .regiao-colapsada {
-    display: none;
-  }
+.regiao-colapsada {
+  display: none;
+}
 
-  .minimizado-lateralmente-direita {
-    max-width: 250px;
-    width: 250px;
-    min-width: 200px;
-  }
+.minimizado-lateralmente-direita {
+  max-width: 250px;
+  width: 250px;
+  min-width: 200px;
+}
 
-  #btn-toggle-categorias {
-    cursor: pointer;
+#btn-toggle-categorias {
+  cursor: pointer;
 
-  }
+}
 
-  .card-ia {
-    border-radius: 12px;
-    padding: 16px;
-    color: #000;
-    line-height: 1.5;
-  }
+.card-ia {
+  border-radius: 12px;
+  padding: 16px;
+  color: #000;
+  line-height: 1.5;
+}
 
-  .card-ia ul {
-    padding-left: 20px;
-  }
+.card-ia ul {
+  padding-left: 20px;
+}
 
-  .card-ia li {
-    margin-bottom: 10px;
-  }
+.card-ia li {
+  margin-bottom: 10px;
+}
 
 
-  /* feedback  */
-  /* =========================
+/* feedback  */
+/* =========================
    MANUAL / FEEDBACK
 ========================= */
-  .manual-container {
-    max-width: 800px;
-    margin: 2rem auto;
-    background: #f1f9ff;
-    padding: 2rem 2.5rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    font-size: 1rem;
-    line-height: 1.6;
-    color: #333;
-  }
+.manual-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  background: #f1f9ff;
+  padding: 2rem 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #333;
+}
 
-  .manual-container h1,
-  .manual-container h2 {
-    color: #209CEE;
-    margin-bottom: 1rem;
-  }
+.manual-container h1,
+.manual-container h2 {
+  color: #209CEE;
+  margin-bottom: 1rem;
+}
 
-  .manual-container p {
-    margin-bottom: 1rem;
-  }
+.manual-container p {
+  margin-bottom: 1rem;
+}
 
-  .manual-container ul {
-    margin-left: 1.5rem;
-    margin-bottom: 1rem;
-  }
+.manual-container ul {
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
 
-  .manual-container .feedback-section {
-    margin-top: 2rem;
-    padding-top: 1rem;
-    border-top: 1px solid #ccc;
-  }
+.manual-container .feedback-section {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #ccc;
+}
 
-  .manual-container .feedback-section form {
-    flex-direction: column;
-    gap: 1rem;
-    max-width: 600px;
-    margin: 0 auto;
-  }
+.manual-container .feedback-section form {
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
 
-  .manual-container .feedback-section input[type="text"],
-  .manual-container .feedback-section textarea {
-    padding: 0.6rem;
-    border: 1px solid #209CEE;
-    border-radius: 6px;
-    width: 100%;
-    font-family: 'Inter', sans-serif;
-  }
+.manual-container .feedback-section input[type="text"],
+.manual-container .feedback-section textarea {
+  padding: 0.6rem;
+  border: 1px solid #209CEE;
+  border-radius: 6px;
+  width: 100%;
+  font-family: 'Inter', sans-serif;
+}
 
-  .manual-container .feedback-section textarea {
-    min-height: 80px;
-    resize: vertical;
-  }
+.manual-container .feedback-section textarea {
+  min-height: 80px;
+  resize: vertical;
+}
 
-  .manual-container .feedback-section button {
-    background-color: #209CEE;
-    color: #fff;
-    font-weight: 600;
-    border-radius: 6px;
-    padding: 0.5rem 1rem;
-    transition: background-color 0.3s;
-  }
+.manual-container .feedback-section button {
+  background-color: #209CEE;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  transition: background-color 0.3s;
+}
 
-  .manual-container .feedback-section button:hover {
-    background-color: #126fb2;
-  }
+.manual-container .feedback-section button:hover {
+  background-color: #126fb2;
+}
 
-  /* =========================
+/* =========================
    AJUDA FLUTUANTE
 ========================= */
-  .ajuda-flutuante {
-    position: fixed;
-    top: 13vh;
-    /* alinhado com o topo da categorias */
-    right: 260px;
-    /* deixa pendurado ao lado da div de categorias */
-    z-index: 9999;
-    width: 40px;
-    height: 40px;
-    background-color: #209CEE;
-    color: white;
-    font-weight: bold;
-    font-size: 24px;
-    border-radius: 50%;
-    text-align: center;
-    line-height: 40px;
-    cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s ease;
-  }
+.ajuda-flutuante {
+  position: fixed;
+  top: 13vh;
+  /* alinhado com o topo da categorias */
+  right: 260px;
+  /* deixa pendurado ao lado da div de categorias */
+  z-index: 997;
+  width: 40px;
+  height: 40px;
+  background-color: #209CEE;
+  color: white;
+  font-weight: bold;
+  font-size: 24px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 40px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease;
+}
 
-  .ajuda-flutuante:hover {
-    transform: scale(1.1);
-  }
+.ajuda-flutuante:hover {
+  transform: scale(1.1);
+}
 
-  .ajuda-flutuante:hover::after {
-    content: "Clique aqui para abrir o manual e enviar feedback";
-    position: absolute;
-    top: 50%;
-    right: 50px;
-    transform: translateY(-50%);
-    background: #f1f9ff;
-    color: #333;
-    padding: 0.6rem 1rem;
-    border-radius: 6px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    white-space: nowrap;
-    font-size: 0.9rem;
-    z-index: 10000;
-  }
+.ajuda-flutuante:hover::after {
+  content: "Clique aqui para abrir o manual e enviar feedback";
+  position: absolute;
+  top: 50%;
+  right: 50px;
+  transform: translateY(-50%);
+  background: #f1f9ff;
+  color: #333;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  white-space: nowrap;
+  font-size: 0.9rem;
+  z-index: 997;
+}
 
 
-  .legenda-container {
+.legenda-container {
   background: #f1f9ff;
   border-radius: 10px;
   padding: 1rem 1.5rem;
   max-width: 800px;
   margin: 1rem auto;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   color: #333;
 }
 
