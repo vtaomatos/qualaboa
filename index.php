@@ -212,9 +212,13 @@ function normalizarCategoria(?string $categoria): string
 
   <!-- Região 2: Filtro de categorias + Mapa -->
   <div id="regiao-2">
+    <div class="ajuda-flutuante" onclick="window.open('feedbacks.php', '_blank')" title="Ajuda">
+      ?
+    </div>
+
     <div id="filtro-categorias" class="card shadow minimizado-lateralmente-direita">
       <div class="card-header d-flex justify-content-between align-items-center p-2">
-        <label for="btn-toggle-categorias"><strong>Categorias</strong></label>
+        <label for="btn-toggle-categorias" style="cursor:pointer"><strong>Categorias</strong></label>
         <button id="btn-toggle-categorias" class="btn btn-sm btn-outline-primary col-5"
           onclick="toggleRegiao('categorias-body', this)">
           ☰
