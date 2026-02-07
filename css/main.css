@@ -95,7 +95,7 @@ body {
   top: 10vh;
   right: 0.5vw;
   width: 240px;
-  z-index: 998;
+  z-index: 997;
   background: #fff;
   padding: 0.75rem;
   border-radius: 10px;
@@ -229,7 +229,7 @@ button {
 #map .gm-style-iw-d {
   max-height: none !important;
   padding-bottom: 20px !important;
-  
+
 }
 
 #map [role="dialog"] {
@@ -313,56 +313,6 @@ h2 {
   overflow-y: scroll;
   scrollbar-color: rgba(0, 0, 0, .5) transparent;
   scrollbar-width: thin;
-}
-
-
-
-/* =========================
-   RESPONSIVIDADE
-========================= */
-@media (max-width: 768px) {
-  form {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  input,
-  button {
-    width: 100%;
-    margin-bottom: 0.5rem;
-  }
-
-  .recomendacoes-container {
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  #chatInput {
-    flex-direction: column;
-  }
-
-  #filtro-categorias {
-    width: 90%;
-    right: 5%;
-    top: 100px;
-  }
-
-  .ajuda-flutuante {
-    left: 20px;
-  }
-
-  .ajuda-flutuante:hover::after {
-    left: 50px;
-    width: 375px;
-  }
-
-  #map button[aria-label="Fechar"] {
-    display: none  !important;
-    min-height: 48px;
-    min-width: 48px;
-    z-index: 10;
-    background-color: #fff !important;
-  }
 }
 
 .regiao-colapsada {
@@ -476,7 +426,7 @@ h2 {
   /* alinhado com o topo da categorias */
   right: 260px;
   /* deixa pendurado ao lado da div de categorias */
-  z-index: 997;
+  z-index: 998;
   width: 40px;
   height: 40px;
   background-color: #209CEE;
@@ -496,9 +446,9 @@ h2 {
 }
 
 .ajuda-flutuante:hover::after {
-  content: "Clique aqui para abrir o manual e enviar feedback";
+  content: "Clique aqui para abrir o manual E para enviar feedback";
   position: absolute;
-  top: 50%;
+  top: 50px;
   right: 50px;
   transform: translateY(-50%);
   background: #f1f9ff;
@@ -506,9 +456,11 @@ h2 {
   padding: 0.6rem 1rem;
   border-radius: 6px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  white-space: nowrap;
+  white-space: pre-line;
+  /* permite quebras de linha */
   font-size: 0.9rem;
-  z-index: 997;
+  z-index: 998;
+  width: 260px;
 }
 
 
@@ -566,4 +518,55 @@ h2 {
   font-size: 0.85rem;
   color: #555;
   text-align: justify;
+}
+
+
+/* =========================
+   RESPONSIVIDADE
+========================= */
+@media (max-width: 768px) {
+  form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  input,
+  button {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .recomendacoes-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  #chatInput {
+    flex-direction: column;
+  }
+
+  #filtro-categorias {
+    width: 90%;
+    right: 5%;
+    top: 100px;
+  }
+
+  .ajuda-flutuante {
+    top: 20vh;
+    left: 20px;
+  }
+
+  .ajuda-flutuante:hover::after {
+    left: 0px;
+    top: 100px;
+    width: 250px;
+  }
+
+  #map button[aria-label="Fechar"] {
+    display: none !important;
+    min-height: 48px;
+    min-width: 48px;
+    z-index: 10;
+    background-color: #fff !important;
+  }
 }
