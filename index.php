@@ -106,26 +106,25 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
   <!-- Região 2: Filtro de categorias + Mapa -->
   <div id="regiao-2">
-    <div id="filtro-categorias" class="card shadow">
-      <div class="card-body p-2">
-        <strong>Categorias</strong>
-        <?php
-        $categorias = [
-          'Música / Shows / Festas',
-          'Cultura / Arte / Teatro',
-          'Esporte / Atividade Física',
-          'Educação / Workshops / Palestras',
-          'Outros / Não identificado'
-        ];
-        foreach ($categorias as $cat):
-          ?>
+    <div id="filtro-categorias" class="card shadow minimizado-lateralmente-direita">
+      <div class="card-header d-flex justify-content-between align-items-center p-2">
+        <label for="btn-toggle-categorias"><strong>Categorias</strong></label>
+        <button id="btn-toggle-categorias" class="btn btn-sm btn-outline-primary col-5"
+          onclick="toggleRegiao('categorias-body', this)">
+          ☰
+        </button>
+      </div>
+      <div id="categorias-body" class="card-body p-2 regiao-colapsada">
+        <?php foreach ($categoriasSelecionadas as $cat): ?>
           <div class="form-check">
-            <input class="form-check-input filtro-categoria" type="checkbox" value="<?= $cat ?>" checked>
-            <label class="form-check-label"><?= $cat ?></label>
+            <input id="categoria-<?= $cat ?>" class="form-check-input filtro-categoria" type="checkbox"
+              value="<?= $cat ?>" checked>
+            <label class="form-check-label" for="categoria-<?= $cat ?>"><?= $cat ?></label>
           </div>
         <?php endforeach; ?>
       </div>
     </div>
+
 
     <div id="margin-mapa"></div>
     <div id="map" class="mt-2 mb-2"></div>
@@ -280,10 +279,35 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
     function toggleRegiao(regiaoId, btn) {
       const regiao = document.getElementById(regiaoId);
       const colapsada = regiao.classList.toggle('regiao-colapsada');
-      const mostrarTexto = regiaoId === 'chat-area' ? `↑ Clique e use IA para encontrar eventos no dia ${dataFiltro}` : `↓ Clique e encontre eventos na sua região por data: ${dataFiltro}`;
-      const ocultarTexto = regiaoId === 'chat-area' ? '↓ Ocultar' : '↑ Ocultar';
-      btn.innerHTML = colapsada ? mostrarTexto : ocultarTexto;
+      if (regiaoId === 'categorias-body') {
+        btn.innerHTML = colapsada ? '☰' : '✖';
+        colapsada ? regiao.classList.add('minimizado-lateralmente-direita') : regiao.classList.remove('minimizado-lateralmente-direita');
+      } else if (regiaoId === 'chat-area') {
+        btn.innerHTML = colapsada ? `↑ Clique e use IA para encontrar eventos no dia ${dataFiltro}` : '↓ Ocultar';
+      } else if (regiaoId === 'form-regiao-1') {
+        btn.innerHTML = colapsada ? `↓ Clique e encontre eventos na sua região por data: ${dataFiltro}` : '↑ Ocultar';
+      }
     }
+
+    function normalizarDataHora(texto) {
+      if (!texto) return texto;
+
+      // Data americana -> brasileira (2026-02-06 → 06/02/2026)
+      texto = texto.replace(
+        /\b(\d{4})-(\d{2})-(\d{2})\b/g,
+        (_, ano, mes, dia) => `${dia}/${mes}/${ano}`
+      );
+
+      // Hora com segundos -> sem segundos (19:00:00 → 19:00)
+      texto = texto.replace(
+        /\b(\d{2}:\d{2}):\d{2}\b/g,
+        '$1'
+      );
+
+      return texto;
+    }
+
+
 
     // =================== Função enviar pergunta IA ===================
     function enviarPergunta() {
@@ -301,7 +325,7 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
       })
         .then(res => res.json())
         .then(data => {
-          
+
           if (data.erro) {
             document.getElementById("explicacaoIA").innerHTML = `<span style="color:red;">⚠️ ${data.erro} <br> ${data.codigo ? `Código: ${data.codigo}` : ''}</span>`;
             document.getElementById("recomendacoesChat").innerHTML = "";
@@ -309,17 +333,18 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
           }
 
           let resposta;
-          try { 
-            resposta = JSON.parse(data.resposta); 
+          try {
+            resposta = JSON.parse(data.resposta);
             resposta = resposta.resposta || resposta; // lidar com estrutura { resposta: { ordem: [...], explicacao: "..." } }
-            resposta.ordem = (resposta.ordem || []).map(id => parseInt(id)); 
-          } catch { 
-            resposta = { 
-              ordem: [], explicacao: data.resposta 
+            resposta.ordem = (resposta.ordem || []).map(id => parseInt(id));
+          } catch {
+            resposta = {
+              ordem: [], explicacao: data.resposta
             };
           }
           ordemPrioridade = resposta.ordem || [];
-          document.getElementById("explicacaoIA").innerHTML = resposta.explicacao || "";
+          const explicacaoFormatada = normalizarDataHora(resposta.explicacao || "");
+          document.getElementById("explicacaoIA").innerHTML = explicacaoFormatada;
           document.getElementById("recomendacoesChat").innerHTML = "";
           initMap();
           document.scrollingElement.scrollTo(0, 999999);

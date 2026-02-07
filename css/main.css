@@ -341,3 +341,16 @@ h2 {
     top: 100px;
   }
 }
+.regiao-colapsada {
+  display: none;
+}
+
+.minimizado-lateralmente-direita{
+  max-width: 250px;
+  min-width: 200px;
+}
+
+#btn-toggle-categorias{
+  cursor:pointer;
+
+}

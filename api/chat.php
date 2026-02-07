@@ -90,10 +90,10 @@ log_event("Lista formatada de eventos para IA:\n" . $listaEventosTexto);
 $mensagemSistema = <<<TXT
 Você é uma IA que vai ajudar a encontrar os melhores eventos com base no prompt do usuário.
 Com base nessa lista de eventos, responda com um json de duas partes;
-Ex do json total: {"ordem": [1, 2, 3], "explicacao": "Humm vai rolar o evento tal que pode ser essa pegada...(resultados em lista html e localização dos eventos)"}
+Ex do json total: {"ordem": [1, 2, 3], "explicacao": "Humm vai rolar o evento tal que pode ser essa pegada...(resultados em lista html mais data e localização dos eventos)"}
 A primeira parte (ordem) do json vai conter todos os ids dos eventos em ordem de relevância para o prompt do usuário;
-A segunda parte do json (explicação) vai ser um texto html explicando suas considerações.
-Se não houver eventos na lista, responda com a primeira parte obj vazio e segunda "Nada encontrado".
+A segunda parte do json (explicacao) vai ser um texto html explicando suas considerações.
+Se não houver eventos na lista, responda com a primeira parte lista vazia e segunda "Nada encontrado".
 Se o usuário fugir do assunto, lembre-o educadamente que você só pode ajudar a encontrar eventos.
 Lista de eventos disponíveis:
 $listaEventosTexto
