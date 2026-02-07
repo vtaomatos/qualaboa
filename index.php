@@ -85,7 +85,8 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 //fazer de para para categorias
 
-function debugQuery($sql, $params) {
+function debugQuery($sql, $params)
+{
   foreach ($params as $p) {
     $p = is_numeric($p) ? $p : "'" . addslashes($p) . "'";
     $sql = preg_replace('/\?/', $p, $sql, 1);
@@ -262,7 +263,7 @@ function normalizarCategoria(?string $categoria): string
     let ordemPrioridade = [];
     let map, markers = [], infoWindow;
 
-    
+
     // Pins coloridos por categoria
     const categoriaPins = {
       "Música / Festas / Bares": "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
@@ -527,7 +528,8 @@ function normalizarCategoria(?string $categoria): string
 
       Object.keys(agrupados).forEach(key => {
         const eventosDoLocal = agrupados[key];
-        const exemplo = eventosDoLocal[0];
+        // Tenta pegar um evento que não seja "Outros / Não identificado"
+        const exemplo = eventosDoLocal.find(ev => ev.categoria !== "Outros / Não identificado") || eventosDoLocal[0];
         const pos = { lat: parseFloat(exemplo.latitude), lng: parseFloat(exemplo.longitude) };
         const tamanho = getTamanhoPorPrioridade(exemplo.id);
         const marker = criarMarker(map, pos, exemplo.titulo, categoriaPins[exemplo.categoria] || categoriaPins["Outros / Não identificado"], tamanho);
