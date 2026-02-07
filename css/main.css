@@ -94,7 +94,7 @@ body {
   position: fixed;
   top: 10vh;
   right: 0.5vw;
-  width: 20vw;
+  width: 240px;
   z-index: 998;
   background: #fff;
   padding: 0.75rem;
@@ -347,10 +347,26 @@ h2 {
 
 .minimizado-lateralmente-direita{
   max-width: 250px;
+  width: 250px;
   min-width: 200px;
 }
 
 #btn-toggle-categorias{
   cursor:pointer;
 
+}
+
+.card-ia {
+  border-radius: 12px;
+  padding: 16px;
+  color: #000;
+  line-height: 1.5;
+}
+
+.card-ia ul {
+  padding-left: 20px;
+}
+
+.card-ia li {
+  margin-bottom: 10px;
 }
