@@ -220,7 +220,7 @@ function normalizarCategoria(?string $categoria): string
         <?php foreach ($categoriasSelecionadas as $cat): ?>
           <div class="form-check">
             <input id="categoria-<?= $cat ?>" class="form-check-input filtro-categoria" type="checkbox"
-              value="<?= $cat ?>" checked>
+              value="<?= $cat ?>" >
             <label class="form-check-label" for="categoria-<?= $cat ?>"><?= $cat ?></label>
           </div>
         <?php endforeach; ?>
