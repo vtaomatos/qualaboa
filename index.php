@@ -8,17 +8,17 @@ try {
 }
 
 $CATEGORIAS_MAPA = [
+  'Cultura / Arte / Teatro / Religiosos' => [
+    'ARTE',
+    'CULTURA',
+    'RELIGIOSO'
+  ],
   'Música / Festas / Bares' => [
     'MUSICA',
     'FESTA',
     'SHOW',
     'BAR',
     'BALADA'
-  ],
-  'Cultura / Arte / Teatro / Religiosos' => [
-    'ARTE',
-    'CULTURA',
-    'RELIGIOSO'
   ],
   'Geek / Educação / Workshops' => [
     'GEEK',
@@ -36,7 +36,6 @@ $CATEGORIAS_MAPA = [
     null
   ],
 ];
-
 
 // Filtro por data
 date_default_timezone_set('America/Sao_Paulo');
@@ -229,7 +228,10 @@ function normalizarCategoria(?string $categoria): string
           <div class="form-check">
             <input id="categoria-<?= $cat ?>" class="form-check-input filtro-categoria" type="checkbox"
               value="<?= $cat ?>">
-            <label class="form-check-label" for="categoria-<?= $cat ?>"><?= $cat ?></label>
+            <label class="form-check-label" for="categoria-<?= $cat ?>">
+              <img src="https://maps.google.com/mapfiles/ms/icons/<?= $CATEGORIAS_CORES[$cat] ?? 'gray' ?>-dot.png">
+              <?= $cat ?>
+            </label>
           </div>
         <?php endforeach; ?>
       </div>
@@ -272,15 +274,13 @@ function normalizarCategoria(?string $categoria): string
     let map, markers = [], infoWindow;
 
 
-    // Pins coloridos por categoria
-    const categoriaPins = {
-      "Música / Festas / Bares": "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
-      "Cultura / Arte / Teatro / Religiosos": "https://maps.google.com/mapfiles/ms/icons/purple-dot.png",
-      "Geek / Educação / Workshops": "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
-      "Esporte / Atividade Física": "https://maps.google.com/mapfiles/ms/icons/green-dot.png",
-      "Outros / Não identificado": "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png"
-    };
+    // LISTA de cores para as categorias (pode ser expandida conforme novas categorias forem adicionadas)
+    const categoriaPins = <?= json_encode($CATEGORIAS_CORES, JSON_UNESCAPED_UNICODE); ?>;
 
+    function getPinUrl(cor) {
+      if (!cor) cor = 'gray';
+      return `https://maps.google.com/mapfiles/ms/icons/${cor}-dot.png`;
+    }
 
     // =================== Funções básicas ===================
     function getFallbackLocation() {
@@ -309,9 +309,9 @@ function normalizarCategoria(?string $categoria): string
 
     function getTamanhoPorPrioridade(id) {
       const index = ordemPrioridade.findIndex(item => parseInt(item) === parseInt(id));
-      if (index === 0) return 50;
-      if (index === 1) return 40;
-      if (index === 2) return 35;
+      if (index === 0) return 60;
+      if (index === 1) return 50;
+      if (index === 2) return 40;
       return 30;
     }
 
@@ -574,7 +574,7 @@ function normalizarCategoria(?string $categoria): string
         const exemplo = eventosDoLocal.find(ev => ev.categoria !== "Outros / Não identificado") || eventosDoLocal[0];
         const pos = { lat: parseFloat(exemplo.latitude), lng: parseFloat(exemplo.longitude) };
         const tamanho = getTamanhoPorPrioridade(exemplo.id);
-        const marker = criarMarker(map, pos, exemplo.titulo, categoriaPins[exemplo.categoria] || categoriaPins["Outros / Não identificado"], tamanho);
+        const marker = criarMarker(map, pos, exemplo.titulo, getPinUrl(categoriaPins[exemplo.categoria] || categoriaPins["Outros / Não identificado"]), tamanho);
         markers.push(marker);
 
         marker.addListener("click", () => {

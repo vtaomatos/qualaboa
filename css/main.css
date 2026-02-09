@@ -520,6 +520,21 @@ h2 {
   text-align: justify;
 }
 
+.legenda-categorias img {
+  height: 25px;
+}
+
+#categorias-body label {
+  display: flex;
+  flex-direction: row;
+
+}
+#categorias-body img {
+  height: 20px;
+}
+
+
+
 
 /* =========================
    RESPONSIVIDADE

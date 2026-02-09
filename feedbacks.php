@@ -143,16 +143,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="legenda-categorias">
                 <h3>📍 Categorias de eventos</h3>
                 <ul>
-                    <li><img src="https://maps.google.com/mapfiles/ms/icons/red-dot.png"
-                            alt="Música / Festas / Bares" /> Música / Festas / Bares</li>
-                    <li><img src="https://maps.google.com/mapfiles/ms/icons/purple-dot.png"
-                            alt="Cultura / Arte / Teatro / Religiosos" /> Cultura / Arte / Teatro / Religiosos</li>
-                    <li><img src="https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-                            alt="Geek / Educação / Workshops" /> Geek / Educação / Workshops</li>
-                    <li><img src="https://maps.google.com/mapfiles/ms/icons/green-dot.png"
-                            alt="Esporte / Atividade Física" /> Esporte / Atividade Física</li>
-                    <li><img src="https://maps.google.com/mapfiles/ms/icons/yellow-dot.png"
-                            alt="Outros / Não identificado" /> Outros / Não identificado</li>
+                    <?php foreach ($CATEGORIAS_CORES as $categoria => $cor): ?>
+                        <li>
+                            <img src="https://maps.google.com/mapfiles/ms/icons/<?= htmlspecialchars($cor) ?>-dot.png"
+                                alt="<?= htmlspecialchars($categoria) ?>" />
+                            <?= htmlspecialchars($categoria) ?>
+                        </li>
+                    <?php endforeach; ?>
                 </ul>
             </div>
 

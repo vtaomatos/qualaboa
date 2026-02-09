@@ -56,7 +56,7 @@ $host = $_SERVER['HTTP_HOST'] ?? 'unknown';
  * RANGE DE DATA
  *************************************/
 $dataInicio = $_GET['inicio'] ?? date('Y-m-01');
-$dataFim = $_GET['fim'] ?? date('Y-m-d');
+$dataFim = $_GET['fim'] ?? date('Y-m-d 23:59:59');
 
 /*************************************
  * LOGS DE ACESSO (ARQUIVO)
@@ -144,9 +144,9 @@ $buscasPorSessao = [];
 
 try {
     $stmt = $conn->query("
-        SELECT sessao_id, termo
-        FROM buscas
-        WHERE DATE(inicio) BETWEEN '{$dataInicio}' AND '{$dataFim}'
+        SELECT sessao_id, pergunta AS termo
+        FROM chat_logs
+        WHERE DATE(data_criacao) BETWEEN '{$dataInicio}' AND '{$dataFim}'
     ");
 
     foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $b) {
@@ -182,6 +182,101 @@ function formatarTempo($segundos)
 }
 
 $tempoMedio = $totalSessoes ? round($tempoTotal / $totalSessoes) : 0;
+
+/*************************************
+ * BUSCAS DOS USUÁRIOS (PAGINADO + FILTROS)
+ *************************************/
+$pagina = max(1, (int) ($_GET['page_buscas'] ?? 1));
+$limite = 20;
+$offset = ($pagina - 1) * $limite;
+
+$filtroSessaoBusca = $_GET['filtro_sessao_busca'] ?? '';
+$filtroTermoBusca = $_GET['filtro_termo_busca'] ?? '';
+
+$where = [];
+$params = [];
+
+$where[] = "DATE(data_criacao) BETWEEN ? AND ?";
+$params[] = $dataInicio;
+$params[] = $dataFim;
+
+if ($filtroSessaoBusca) {
+    $where[] = "sessao_id = ?";
+    $params[] = $filtroSessaoBusca;
+}
+
+if ($filtroTermoBusca) {
+    $where[] = "pergunta LIKE ?";
+    $params[] = "%{$filtroTermoBusca}%";
+}
+
+$whereSql = implode(' AND ', $where);
+
+// total
+$stmt = $conn->prepare("SELECT COUNT(*) FROM chat_logs WHERE $whereSql");
+$stmt->execute($params);
+$totalBuscas = (int) $stmt->fetchColumn();
+
+// dados
+$stmt = $conn->prepare("
+    SELECT sessao_id, pergunta as termo, data_criacao as inicio
+    FROM chat_logs
+    WHERE $whereSql
+    ORDER BY inicio DESC
+    LIMIT $limite OFFSET $offset
+");
+$stmt->execute($params);
+$buscas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$totalPaginasBuscas = ceil($totalBuscas / $limite);
+
+/*************************************
+ * FEEDBACKS (PAGINADO + FILTROS)
+ *************************************/
+$paginaFb = max(1, (int) ($_GET['page_feedbacks'] ?? 1));
+$limiteFb = 20;
+$offsetFb = ($paginaFb - 1) * $limiteFb;
+
+$filtroSessaoFb = $_GET['filtro_sessao_fb'] ?? '';
+$filtroTipoFb = $_GET['filtro_tipo_fb'] ?? '';
+
+$whereFb = [];
+$paramsFb = [];
+
+$whereFb[] = "DATE(criado_em) BETWEEN ? AND ?";
+$paramsFb[] = $dataInicio;
+$paramsFb[] = $dataFim;
+
+if ($filtroSessaoFb) {
+    $whereFb[] = "sessao_id = ?";
+    $paramsFb[] = $filtroSessaoFb;
+}
+
+if ($filtroTipoFb) {
+    $whereFb[] = "tipo = ?";
+    $paramsFb[] = $filtroTipoFb;
+}
+
+$whereFbSql = implode(' AND ', $whereFb);
+
+// total
+$stmt = $conn->prepare("SELECT COUNT(*) FROM feedbacks WHERE $whereFbSql");
+$stmt->execute($paramsFb);
+$totalFeedbacks = (int) $stmt->fetchColumn();
+
+// dados
+$stmt = $conn->prepare("
+    SELECT sessao_id, tipo, mensagem, criado_em
+    FROM feedbacks
+    WHERE $whereFbSql
+    ORDER BY criado_em DESC
+    LIMIT $limiteFb OFFSET $offsetFb
+");
+$stmt->execute($paramsFb);
+$feedbacks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$totalPaginasFb = ceil($totalFeedbacks / $limiteFb);
+
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -438,6 +533,93 @@ $tempoMedio = $totalSessoes ? round($tempoTotal / $totalSessoes) : 0;
         </div>
     </div>
 
+    <h2>🔎 Buscas dos Usuários</h2>
+
+    <form>
+        <input type="hidden" name="inicio" value="<?= $dataInicio ?>">
+        <input type="hidden" name="fim" value="<?= $dataFim ?>">
+
+        <input name="filtro_sessao_busca" placeholder="Sessão" value="<?= htmlspecialchars($filtroSessaoBusca) ?>">
+
+        <input name="filtro_termo_busca" placeholder="Termo buscado" value="<?= htmlspecialchars($filtroTermoBusca) ?>">
+
+        <button>Filtrar</button>
+    </form>
+
+    <table>
+        <tr>
+            <th>Sessão</th>
+            <th>Busca</th>
+            <th>Quando</th>
+        </tr>
+        <?php foreach ($buscas as $b): ?>
+            <tr>
+                <td><?= htmlspecialchars($b['sessao_id']) ?></td>
+                <td><?= htmlspecialchars($b['termo']) ?></td>
+                <td><?= $b['inicio'] ?></td>
+            </tr>
+        <?php endforeach; ?>
+    </table>
+
+    <?php for ($i = 1; $i <= $totalPaginasBuscas; $i++): ?>
+        <a href="?page_buscas=<?= $i ?>">[<?= $i ?>]</a>
+    <?php endfor; ?>
+
+
+    <h2>💬 Feedbacks</h2>
+
+    <form>
+        <input type="hidden" name="inicio" value="<?= $dataInicio ?>">
+        <input type="hidden" name="fim" value="<?= $dataFim ?>">
+
+        <input name="filtro_sessao_fb" placeholder="Sessão" value="<?= htmlspecialchars($filtroSessaoFb) ?>">
+
+        <input type="text" id="filtro-feedback" placeholder="Filtrar palavras..." style="">
+
+        <label id="filtro_tipo_fb">Tipo de feedback:
+            <select name="filtro_tipo_fb">
+                <option value="">Todos</option>
+                <option value="correcao" <?= $filtroTipoFb === 'correcao' ? 'selected' : '' ?>>Correção</option>
+                <option value="opiniao" <?= $filtroTipoFb === 'opiniao' ? 'selected' : '' ?>>Opinião</option>
+                <option value="sugestao" <?= $filtroTipoFb === 'sugestao' ? 'selected' : '' ?>>Sugestão</option>
+            </select>
+        </label>
+
+        <button>Filtrar</button>
+    </form>
+
+    <table>
+        <tr>
+            <th>Sessão</th>
+            <th>Tipo</th>
+            <th>Mensagem</th>
+            <th>Quando</th>
+        </tr>
+        <?php foreach ($feedbacks as $f): ?>
+            <tr>
+                <td>
+                    <?= htmlspecialchars($f['sessao_id']) ?>
+                </td>
+                <td><span class="badge">
+                        <?= strtoupper($f['tipo']) ?>
+                    </span></td>
+                <td>
+                    <?= nl2br(htmlspecialchars($f['mensagem'])) ?>
+                </td>
+                <td>
+                    <?= $f['criado_em'] ?>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </table>
+
+    <?php for ($i = 1; $i <= $totalPaginasFb; $i++): ?>
+        <a href="?page_feedbacks=<?= $i ?>">[
+            <?= $i ?>]
+        </a>
+    <?php endfor; ?>
+
+
     <script>
         const heatmapData = <?= json_encode($heatmap) ?>.map(p =>
             new google.maps.LatLng(p.lat, p.lng)
@@ -488,6 +670,20 @@ $tempoMedio = $totalSessoes ? round($tempoTotal / $totalSessoes) : 0;
         criarGraficoBarra(document.getElementById('chartSemana'), Object.keys(dadosSemana), Object.values(dadosSemana), 'Acessos por Semana');
         criarGraficoBarra(document.getElementById('chartMes'), Object.keys(dadosMes), Object.values(dadosMes), 'Acessos por Mês');
         criarGraficoBarra(document.getElementById('chartDiaSemana'), Object.keys(dadosDiaSemana), Object.values(dadosDiaSemana), 'Dia da Semana Mais Acessado');
+
+        document.getElementById('filtro-feedback').addEventListener('input', function () {
+            const termo = this.value.toLowerCase();
+            const feedbacks = document.querySelectorAll('.feedback-item');
+
+            feedbacks.forEach(feedback => {
+                const texto = feedback.textContent.toLowerCase();
+
+                feedback.style.display = texto.includes(termo)
+                    ? ''
+                    : 'none';
+            });
+        });
+
     </script>
 
 </body>
