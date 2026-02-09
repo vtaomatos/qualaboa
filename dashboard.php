@@ -1,4 +1,5 @@
 <?php
+
 /*************************************
  * CONFIGURAÇÕES
  *************************************/
@@ -50,7 +51,15 @@ if (!($_SESSION['dash_auth'] ?? false)) {
     exit;
 }
 
-$host = $_SERVER['HTTP_HOST'] ?? 'unknown';
+$host = $_SERVER['HTTP_HOST'] ?? '';
+$host = strtolower($host);
+$host = preg_replace('/:\d+$/', '', $host);   // remove porta
+$hostSemWww = preg_replace('/^www\./', '', $host);
+
+$hostsParaComparar = [
+    $hostSemWww,
+    'www.' . $hostSemWww
+];
 
 /*************************************
  * RANGE DE DATA
@@ -128,13 +137,18 @@ $stmt = $conn->prepare("
         lng,
         inicio
     FROM sessoes
-    WHERE host = ?
+    WHERE host IN (?, ?)
       AND DATE(inicio) BETWEEN ? AND ?
     ORDER BY inicio DESC
 ");
-$stmt->execute([$host, $dataInicio, $dataFim]);
-$sessoes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+$stmt->execute([
+    $hostsParaComparar[0],
+    $hostsParaComparar[1],
+    $dataInicio,
+    $dataFim
+]);
+$sessoes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $totalSessoes = count($sessoes);
 
 /*************************************
@@ -515,6 +529,17 @@ $totalPaginasFb = ceil($totalFeedbacks / $limiteFb);
     </table>
 
     <h2>🔥 Heatmap</h2>
+    <h2>📍 Localizar coordenada</h2>
+
+    <div style="margin-bottom:10px">
+        <input id="coord-input" placeholder="-23.5505, -46.6333"
+            style="padding:6px 10px;border-radius:6px;border:1px solid #ccc;width:260px">
+
+        <button onclick="buscarCoordenada()"
+            style="padding:6px 12px;border-radius:6px;border:none;background:#36A2EB;color:#fff;cursor:pointer">
+            Mostrar no mapa
+        </button>
+    </div>
     <div id="heatmap"></div>
 
     <h2>📊 Gráficos de Acesso</h2>
@@ -664,6 +689,58 @@ $totalPaginasFb = ceil($totalFeedbacks / $limiteFb);
                 }
             });
         }
+
+        const heatmapData2 = <?= json_encode($heatmap) ?>.map(p =>
+            new google.maps.LatLng(p.lat, p.lng)
+        );
+
+        const heatmapLayer = new google.maps.visualization.HeatmapLayer({
+            data: heatmapData2,
+            radius: 25
+        });
+
+        heatmapLayer.setMap(map);
+
+        let markerSessao = null;
+
+        function marcarPonto(lat, lng) {
+            if (markerSessao) {
+                markerSessao.setMap(null);
+            }
+
+            markerSessao = new google.maps.Marker({
+                position: { lat, lng },
+                map,
+                icon: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+            });
+
+            map.setCenter({ lat, lng });
+            map.setZoom(15);
+        }
+
+        function buscarCoordenada() {
+            const input = document.getElementById('coord-input').value;
+            if (!input.includes(',')) return alert('Use o formato: lat, lng');
+
+            const [lat, lng] = input.split(',').map(v => parseFloat(v.trim()));
+
+            if (isNaN(lat) || isNaN(lng)) {
+                alert('Coordenadas inválidas');
+                return;
+            }
+
+            marcarPonto(lat, lng);
+        }
+
+        // 🔗 Se vier coordenada via URL (?lat=...&lng=...)
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('lat') && params.has('lng')) {
+            marcarPonto(
+                parseFloat(params.get('lat')),
+                parseFloat(params.get('lng'))
+            );
+        }
+
 
         // Criando gráficos
         criarGraficoBarra(document.getElementById('chartDia'), Object.keys(dadosDia), Object.values(dadosDia), 'Acessos por Dia');

@@ -2,6 +2,12 @@
 require_once './config/db.php';
 date_default_timezone_set('America/Sao_Paulo');
 
+if (isset($_GET['sessao_id']) && preg_match('/^[a-zA-Z0-9]+$/', $_GET['sessao_id'])) {
+    session_id($_GET['sessao_id']);
+}
+
+session_start();
+
 // ==========================
 // CRIAÇÃO DA TABELA (EXECUTAR UMA VEZ)
 // ==========================
@@ -26,8 +32,7 @@ $feedback_enviado = false;
 $feedback_erro = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $sessao_id = session_id() ?: bin2hex(random_bytes(16));
-    session_id($sessao_id);
+    $sessao_id = session_id();
     $tipo = $_POST['tipo'] ?? '';
     $mensagem = trim($_POST['mensagem'] ?? '');
 

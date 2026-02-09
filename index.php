@@ -211,7 +211,7 @@ function normalizarCategoria(?string $categoria): string
 
   <!-- Região 2: Filtro de categorias + Mapa -->
   <div id="regiao-2">
-    <div class="ajuda-flutuante" onclick="window.open('feedbacks.php', '_blank')" title="Ajuda">
+    <div class="ajuda-flutuante" onclick="window.open('feedbacks.php?sessao_id=<?= urlencode($sessaoId) ?>', '_blank')" title="Ajuda">
       ?
     </div>
 
