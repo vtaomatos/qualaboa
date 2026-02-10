@@ -41,7 +41,7 @@ $CATEGORIAS_MAPA = [
 date_default_timezone_set('America/Sao_Paulo');
 $dataFiltro = $_GET['data'] ?? date('Y-m-d');
 $horaFiltro = $_GET['hora'] ?? '00:00';
-$dataFormatada = htmlspecialchars($_GET['data'] ?? date('d/m/Y'));
+$dataFormatada = htmlspecialchars(date('d/m/Y', strtotime($dataFiltro)));
 
 $categoriasSelecionadas = $_GET['categorias'] ?? array_keys($CATEGORIAS_MAPA);
 
@@ -273,6 +273,8 @@ function normalizarCategoria(?string $categoria): string
     let ordemPrioridade = [];
     let map, markers = [], infoWindow;
 
+    const imgDefault = '/imagens/sem_imagem.jpg';
+
 
     // LISTA de cores para as categorias (pode ser expandida conforme novas categorias forem adicionadas)
     const categoriaPins = <?= json_encode($CATEGORIAS_CORES, JSON_UNESCAPED_UNICODE); ?>;
@@ -371,7 +373,7 @@ function normalizarCategoria(?string $categoria): string
         fetch(`/api/evento_flyer.php?id=${ev.id}`)
           .then(r => r.json())
           .then(data => {
-            if (!data.imagem) return;
+            if (!data.imagem) data.imagem = imgDefault;
             const img = document.getElementById(`flyer-${ev.id}`);
             if (!img) return;
             img.src = data.imagem;
@@ -399,9 +401,9 @@ function normalizarCategoria(?string $categoria): string
         btn.innerHTML = colapsada ? '☰' : '✖';
         colapsada ? regiao.classList.add('minimizado-lateralmente-direita') : regiao.classList.remove('minimizado-lateralmente-direita');
       } else if (regiaoId === 'chat-area') {
-        btn.innerHTML = colapsada ? `↑ Clique e use IA para encontrar eventos no dia ${dataFiltro}` : '↓ Ocultar';
-      } else if (regiaoId === 'form-regiao-1') {
-        btn.innerHTML = colapsada ? `↓ Clique e encontre eventos na sua região por data: ${dataFiltro}` : '↑ Ocultar';
+          btn.innerHTML = colapsada ? `↑ Clique e use IA para encontrar eventos no dia ${dataFiltro}` : '↓ Ocultar';
+        } else if (regiaoId === 'form-regiao-1') {
+          btn.innerHTML = colapsada ? `↓ Clique e encontre eventos na sua região por data: ${dataFiltro}` : '↑ Ocultar';
       }
     }
 
