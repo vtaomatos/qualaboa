@@ -370,7 +370,7 @@ function normalizarCategoria(?string $categoria): string
 
     function carregarImagensEventos(eventos) {
       eventos.forEach(ev => {
-        fetch(`/api/evento_flyer.php?id=${ev.id}`)
+        fetch(`${BASE_URL}/../api/evento_flyer.php?id=${ev.id}`)
           .then(r => r.json())
           .then(data => {
             if (!data.imagem) data.imagem = imgDefault;

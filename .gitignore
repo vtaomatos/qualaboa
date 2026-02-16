@@ -1,2 +1,20 @@
 secretsConstants.php
 AcessosContas.txt
+
+# Logs
+logs/
+*.log
+*.txt
+
+# Configs sensíveis
+v2/config/secretConstants*.php
+
+# VSCode
+.vscode/
+
+# Backups
+bkps/
+
+# Seeds e debug
+phpinfo.php
+seed.php
