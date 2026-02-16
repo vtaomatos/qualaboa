@@ -127,7 +127,7 @@ foreach ($categorias as $categoria) {
 
             <!-- MAPA -->
             <div id="map-container">
-                <div id="filtro-categorias" class="card shadow minimizado-lateralmente-direita">
+                <div id="filtro-categorias" class="card shadow">
                     <div class="card-header d-flex justify-content-between align-items-center p-2">
                         <label id="title-categorias" for="btn-toggle-categorias" style="cursor:pointer">
                             <strong>

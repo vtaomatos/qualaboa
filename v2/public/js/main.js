@@ -44,11 +44,9 @@ window.toggleRegiao = function (regiaoId, btn) {
         const filtroCategorias = document.getElementById('filtro-categorias')
         btn.innerHTML = colapsada ? '☰' : '✖';
         if (colapsada) {
-            regiao.classList.add('minimizado-lateralmente-direita');
             titleCategorias.style.display = 'none';
             filtroCategorias.style.backgroundColor = 'rgba(0,0,0,.1)';
         } else {
-            regiao.classList.remove('minimizado-lateralmente-direita');
             titleCategorias.style.display = 'flex';
             filtroCategorias.style.backgroundColor = '#fff';
         }
