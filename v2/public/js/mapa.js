@@ -6,12 +6,13 @@ App.initMap = function () {
                 zoom: 12,
                 center: { lat: -23.9608, lng: -46.3331 },
                 fullscreenControl: false,
-                zoomControl: false,
+                zoomControl: true,
                 mapTypeControl: false,
                 scaleControl: false,
                 streetViewControl: false,
                 rotateControl: false,
-                mapTypeId: 'satellite'
+                mapTypeId: 'satellite',
+                gestureHandling: "cooperative"
             }
         );
     }
