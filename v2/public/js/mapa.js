@@ -309,8 +309,25 @@ App.criarBotaoFechar = function (infoWindow, map) {
     return btnFechar;
 }
 
+App.abrirPinEventoFiltrado = function () {
 
+    const markers = App.state.markers || [];
 
+    if (!markers.length) return;
+
+    // Se existir apenas um marker
+    if (markers.length === 1) {
+
+        const marker = markers[0];
+
+        // Centraliza no marker
+        App.state.map.setCenter(marker.getPosition());
+        App.state.map.setZoom(15);
+
+        // Dispara o clique programaticamente
+        google.maps.event.trigger(marker, "click");
+    }
+};
 
 document.addEventListener("eventosAtualizados", App.atualizarMarkers);
 

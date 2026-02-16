@@ -569,8 +569,8 @@ h2 {
 .dias-semana {
   display: flex;
   justify-content: space-between;
-  padding: 2vh 0;
-  margin: 2vh 0;
+  padding: 1vh 0;
+  margin: 1vh 0;
 }
 
 .dia-card {
@@ -714,7 +714,7 @@ h2 {
   #agenda-lateral,
   #map-container {
     width: 100%;
-    height: 50vh;
+    height: 80vh;
   }
 }
 

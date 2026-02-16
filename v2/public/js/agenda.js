@@ -267,13 +267,15 @@ App.renderEventosDia = function () {
 
         div.addEventListener("click", () => {
             App.mostrarDetalhesEvento(ev, div);
+            App.filtrarMapaPorEvento(ev);
+            App.abrirPinEventoFiltrado();
             e.stopPropagation();
         });
 
-        div.querySelector("button")
-            .addEventListener("click", () => {
-                App.filtrarMapaPorEvento(ev);
-            });
+        // div.querySelector("button")
+        //     .addEventListener("click", () => {
+        //         App.filtrarMapaPorEvento(ev);
+        //     });
 
 
 
