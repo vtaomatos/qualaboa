@@ -38,7 +38,7 @@ while ($loop < $maxLoops) {
 
         // Remove ./ inicial se existir
         $relativePath = ltrim($evento['flyer_imagem'], './');
-        $fullPath = __DIR__ . '/' . $relativePath;
+        $fullPath = $_SERVER['DOCUMENT_ROOT'] . '/' . $relativePath;
 
         $dir = dirname($fullPath);
 

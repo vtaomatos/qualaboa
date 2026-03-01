@@ -1,5 +1,21 @@
 RewriteEngine On
 
+# ============================================
+# STORIES_CAPTURADOS - prioridade máxima
+# ============================================
+
+RewriteCond %{REQUEST_URI} ^/stories_capturados/
+RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -f
+RewriteRule ^ - [L]
+
+RewriteCond %{REQUEST_URI} ^/stories_capturados/
+RewriteCond %{DOCUMENT_ROOT}/v2/public%{REQUEST_URI} -f
+RewriteRule ^stories_capturados/(.*)$ v2/public/stories_capturados/$1 [L]
+
+# ============================================
+# REGRAS ATUAIS
+# ============================================
+
 # Se já estiver acessando algo dentro de /v2, não reescreve
 RewriteCond %{REQUEST_URI} ^/v2/
 RewriteRule ^ - [L]

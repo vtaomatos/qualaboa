@@ -32,15 +32,23 @@ if (!$evento) {
 // prioridade de exibição
 if (!empty($evento['flyer_imagem'])) {
 
-  $caminhoFisico = __DIR__ . '/../public/' . ltrim($evento['flyer_imagem'], './');
+  $caminho = $evento['flyer_imagem'];
+
+  // Se começar com "./", remove apenas esse prefixo
+  if (str_starts_with($caminho, './')) {
+    $caminho = substr($caminho, 1); // remove apenas o ponto
+  }
+
+  $caminhoFisico = $_SERVER['DOCUMENT_ROOT'] . $caminho;
 
   if (file_exists($caminhoFisico)) {
     echo json_encode([
-      'imagem' => $evento['flyer_imagem']
+      'imagem' => $caminho
     ]);
     exit;
   }
 }
+
 
 if (!empty($evento['imagem_base64'])) {
   echo json_encode([
