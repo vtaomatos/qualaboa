@@ -6,7 +6,7 @@ App.initMap = function () {
                 zoom: 12,
                 center: { lat: -23.9608, lng: -46.3331 },
                 fullscreenControl: false,
-                zoomControl: true,
+                zoomControl: false,
                 mapTypeControl: false,
                 scaleControl: false,
                 streetViewControl: false,
@@ -227,7 +227,7 @@ App.criarSliderEventos = function (eventos) {
       <div class="img-placeholder" data-evento-id="${ev.id}">
         <div class="flyer-wrapper">
           <div class="flyer-loader"><div class="spinner"></div><span>Carregando imagem…</span></div>
-          <img id="${imgId}" class="flyer-img hidden" style="max-width:150px; max-height:50vh; object-fit:contain;"
+          <img id="${imgId}" class="flyer-img hidden" style="max-width:100px; max-height:50vh; object-fit:contain;"
             alt="${ev.titulo}" onclick="abrirLightbox(this)"/>
         </div>
         <br>
@@ -243,18 +243,47 @@ App.carregarImagensEventos = function (eventos) {
     const imgDefault = '/imagens/sem_imagem.jpg';
 
     eventos.forEach(ev => {
+
         fetch(`${BASE_URL}/../api/evento_flyer.php?id=${ev.id}`)
             .then(r => r.json())
             .then(data => {
-                if (!data.imagem) data.imagem = imgDefault;
+
                 const img = document.getElementById(`flyer-${ev.id}`);
                 if (!img) return;
-                img.src = data.imagem;
-                img.onload = () => { img.classList.remove('hidden'); const loader = img.previousElementSibling; if (loader) loader.remove(); }
-            });
-    });
-}
 
+                // Caso 1: imagem normal (path ou base64)
+                if (data.imagem) {
+                    img.src = data.imagem;
+                }
+
+                // Caso 2: HTML
+                else if (data.html) {
+                    const wrapper = img.closest('.flyer-wrapper');
+                    if (wrapper) {
+                        wrapper.innerHTML = data.html;
+                    }
+                    return;
+                }
+
+                // Caso 3: fallback
+                else {
+                    img.src = imgDefault;
+                }
+
+                img.onload = () => {
+                    img.classList.remove('hidden');
+                    const loader = img.previousElementSibling;
+                    if (loader) loader.remove();
+                };
+
+            })
+            .catch(() => {
+                const img = document.getElementById(`flyer-${ev.id}`);
+                if (img) img.src = imgDefault;
+            });
+
+    });
+};
 
 App.getTamanhoPorPrioridade = function (id) {
 
@@ -279,6 +308,7 @@ App.getPinUrl = function (cor) {
 App.criarBotaoFechar = function (infoWindow, map) {
     // Cria o botão
     const btnFechar = document.createElement('button');
+    btnFechar.id = 'infowindow-close'
     btnFechar.textContent = 'X';
     btnFechar.style.position = 'absolute';
     btnFechar.style.top = '10px';
@@ -302,8 +332,7 @@ App.criarBotaoFechar = function (infoWindow, map) {
 
     // Fecha o InfoWindow ao clicar
     btnFechar.addEventListener('click', () => {
-        infoWindow.close();
-        map.panBy(0, 250); // Ajusta o mapa se necessário
+        App.fecharDetalheEventoAgendaComInfoWindow();
     });
 
     return btnFechar;

@@ -297,7 +297,7 @@ App.filtrarMapaPorEvento = function (evento) {
 
     App.state.dataFiltroFormatada = App.formatarDataBR(evento.data_evento);
 
-    if (!App.state.filtroEventoId) {
+    if (!App.state.filtroEventoId || App.state.filtroEventoId != evento.id) {
         App.state.filtroEventoId = evento.id;
     } else {
         App.state.filtroEventoId = null
@@ -324,10 +324,20 @@ App.mostrarDetalhesEvento = async function (ev, itemEvento) {
 
     // Busca a imagem do evento
     let img;
+    let htmlContent = null;
+
     try {
         const res = await fetch(`${BASE_URL}/../api/evento_flyer.php?id=${ev.id}`);
         const data = await res.json();
-        img = data.imagem || imgDefault;
+
+        if (data.imagem) {
+            img = data.imagem;
+        } else if (data.html) {
+            htmlContent = data.html;
+        } else {
+            img = imgDefault;
+        }
+
     } catch (err) {
         console.error("Erro ao buscar imagem do evento", err);
         img = imgDefault;
@@ -338,8 +348,7 @@ App.mostrarDetalhesEvento = async function (ev, itemEvento) {
     div.setAttribute('id', 'evento-card-' + ev.id);
     div.className = "evento-detalhe-temporaria card p-3 shadow-sm mb-3";
 
-    div.innerHTML = `
-        ${img ? `
+    div.innerHTML = htmlContent ? htmlContent : ((img ? `
         <div class="evento-imagem-wrapper position-relative">
             <img style="max-width:250px" src="${img}" class="card-img-top rounded-top" alt="${ev.titulo}">
             <div class="overlay-titulo position-absolute bottom-0 start-0 w-100 p-2 bg-dark bg-opacity-50 text-white">
@@ -348,7 +357,7 @@ App.mostrarDetalhesEvento = async function (ev, itemEvento) {
         </div>` : `
         <div class="p-3">
             <h4>${ev.titulo}</h4>
-        </div>`}
+        </div>`) + `
 
         <div class="card-body">
             ${ev.descricao ? `<p class="card-text">${ev.descricao}</p>` : ""}
@@ -362,14 +371,14 @@ App.mostrarDetalhesEvento = async function (ev, itemEvento) {
                 <button class="btn btn-primary flex-grow-1" id="btnVerMapa">Ver no mapa</button>
             </div>
         </div>
-    `;
+    `);
 
     // Insere logo abaixo do item clicado
     itemEvento.insertAdjacentElement("afterend", div);
 
     // Botão voltar — remove só esta div temporária
     div.querySelector("#btnVoltarDetalhe").addEventListener("click", () => {
-        div.remove();
+        App.fecharDetalheEventoAgendaComInfoWindow();
     });
 
     // Botão ver no mapa
@@ -377,5 +386,14 @@ App.mostrarDetalhesEvento = async function (ev, itemEvento) {
         App.filtrarMapaPorEvento(ev);
         div.scrollIntoView({ behavior: "smooth" });
     });
+
+    App.state.divAbertaDetealhesEvento = div;
 };
+
+App.fecharDetalheEventoAgendaComInfoWindow = function () {
+    App.state.divAbertaDetealhesEvento.remove();
+    App.state.divAbertaDetealhesEvento = null;
+    document.querySelector('#infowindow-close').click();
+    App.state.map.panBy(0, 250);
+}
 

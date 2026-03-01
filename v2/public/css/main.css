@@ -214,7 +214,7 @@ button {
 }
 
 #map [role="dialog"] {
-  max-height: none !important;
+  /* max-height: none !important; */
   min-width: 247px !important;
 }
 
@@ -397,7 +397,7 @@ h2 {
 ========================= */
 .ajuda-flutuante {
   position: absolute;
-  top: 25px;
+  top: 5px;
   /* alinhado com o topo da categorias */
   right: 10px;
   /* deixa pendurado ao lado da div de categorias */
@@ -663,6 +663,10 @@ h2 {
   display: none !important;
 }
 
+.zera-padding-margin{
+  padding: 0 !important;
+  margin: 0 !important;
+}
 
 /* =========================
    RESPONSIVIDADE
@@ -767,9 +771,4 @@ h2 {
     /* crescer naturalmente */
     overflow-y: visible;
   }
-}
-
-
-@media (max-width: 465px){
-
 }

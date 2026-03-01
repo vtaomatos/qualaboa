@@ -1,0 +1,6 @@
+RewriteEngine On
+
+# Se não for arquivo nem pasta real, manda pro index
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [L]

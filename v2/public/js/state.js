@@ -13,7 +13,8 @@ window.App = {
         fallbackLocation: {
             lat: -23.9608,
             lng: -46.3331
-        }
+        },
+        divAbertaDetealhesEvento: null
     }
 };
 

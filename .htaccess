@@ -1,0 +1,13 @@
+RewriteEngine On
+
+# Se já estiver acessando algo dentro de /v2, não reescreve
+RewriteCond %{REQUEST_URI} ^/v2/
+RewriteRule ^ - [L]
+
+# Se o arquivo existir dentro de v2/public, serve ele
+RewriteCond %{DOCUMENT_ROOT}/v2/public/$1 -f [OR]
+RewriteCond %{DOCUMENT_ROOT}/v2/public/$1 -d
+RewriteRule ^(.*)$ v2/public/$1 [L]
+
+# Caso contrário, manda para index da v2
+RewriteRule ^(.*)$ v2/public/index.php [L]

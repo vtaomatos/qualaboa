@@ -41,14 +41,19 @@ window.toggleRegiao = function (regiaoId, btn) {
     const colapsada = regiao.classList.toggle('regiao-colapsada');
     if (regiaoId === 'categorias-body') {
         const titleCategorias = document.getElementById('title-categorias');
-        const filtroCategorias = document.getElementById('filtro-categorias')
+        const filtroCategorias = document.getElementById('filtro-categorias');
+        const cardHeader = filtroCategorias.getElementsByClassName('card-header')[0];
         btn.innerHTML = colapsada ? '☰' : '✖';
         if (colapsada) {
             titleCategorias.style.display = 'none';
             filtroCategorias.style.backgroundColor = 'rgba(0,0,0,.1)';
+            filtroCategorias.classList.add('zera-padding-margin');
+            cardHeader.classList.add('zera-padding-margin')
         } else {
             titleCategorias.style.display = 'flex';
             filtroCategorias.style.backgroundColor = '#fff';
+            filtroCategorias.classList.remove('zera-padding-margin');
+            cardHeader.classList.remove('zera-padding-margin')
         }
     } else if (regiaoId === 'chat-area') {
         // btn.innerHTML = colapsada ? `↑ Busca com IA no dia ${App.state.dataFiltroFormatada.split(' ')[0]}` : '↓ Ocultar';
