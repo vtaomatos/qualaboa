@@ -3,8 +3,8 @@ App.initMap = function () {
         App.state.map = new google.maps.Map(
             document.getElementById("map"),
             {
-                zoom: 12,
-                center: { lat: -23.9608, lng: -46.3331 },
+                zoom: App.state.mapZoom || 12,
+                center: App.state.mapCenter || { lat: -23.9608, lng: -46.3331 },
                 fullscreenControl: false,
                 zoomControl: false,
                 mapTypeControl: false,
@@ -146,7 +146,18 @@ App.atualizarMarkers = function () {
                 App.criarSliderEventos?.(eventosDoLocal) || ""
             );
 
+            if (!App.state.infoWindowOpen) {
+                App.state.mapCenter = App.state.map.getCenter();
+                App.state.mapZoom = App.state.map.getZoom();
+            }
+            console.log("zoom", App.state.mapZoom);
+
             App.state.infoWindow.open(map, marker);
+            App.state.infoWindowOpen = true;
+
+            // Centraliza no marker
+            App.state.map.setCenter(marker.getPosition());
+            App.state.map.setZoom(15);
 
             map.panBy(0, -250);
 
@@ -348,10 +359,6 @@ App.abrirPinEventoFiltrado = function () {
     if (markers.length === 1) {
 
         const marker = markers[0];
-
-        // Centraliza no marker
-        App.state.map.setCenter(marker.getPosition());
-        App.state.map.setZoom(15);
 
         // Dispara o clique programaticamente
         google.maps.event.trigger(marker, "click");

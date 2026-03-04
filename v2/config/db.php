@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/secretConstants.prod.php';
+require_once __DIR__ . '/../../secretsConstants.php';
 
 $host = DB_HOST;
 $db = DB_NAME;

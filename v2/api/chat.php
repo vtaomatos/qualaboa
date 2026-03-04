@@ -1,7 +1,7 @@
 <?php
 // api/chat.php
-require_once './../config/secretConstants.prod.php';
-require_once './../config/db.php';
+require_once __DIR__ . '/../../secretsConstants.php';
+require_once __DIR__ . '/../config/db.php';
 
 error_reporting(E_ALL);
 date_default_timezone_set('America/Sao_Paulo');

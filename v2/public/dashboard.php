@@ -4,9 +4,9 @@
  * CONFIGURAÇÕES
  *************************************/
 date_default_timezone_set('America/Sao_Paulo');
-require_once __DIR__ . '../config/db.php'; // cria $conn
+require_once __DIR__ . '/../config/db.php'; // cria $conn
 
-$LOG_DIR = __DIR__ . '../logs/';
+$LOG_DIR = __DIR__ . '/../logs/';
 $DASH_USER = DASH_USER ?? 'admin';
 $DASH_PASS = DASH_PASS ?? '12345677';
 

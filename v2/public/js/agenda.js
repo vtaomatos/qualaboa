@@ -265,11 +265,16 @@ App.renderEventosDia = function () {
             </button>
         `;
 
-        div.addEventListener("click", () => {
+        div.addEventListener("click", (e) => {
+            const navegacaoAberta = document.getElementById('evento-card-' + ev.id)
+            if (navegacaoAberta) {
+                // navegacaoAberta.remove();
+                App.fecharDetalheEventoAgendaComInfoWindow();
+                return;
+            }
             App.mostrarDetalhesEvento(ev, div);
             App.filtrarMapaPorEvento(ev);
             App.abrirPinEventoFiltrado();
-            e.stopPropagation();
         });
 
         // div.querySelector("button")
@@ -391,9 +396,13 @@ App.fecharDetalheEventoAgendaComInfoWindow = function () {
         App.state.divAbertaDetealhesEvento.remove();
         App.state.divAbertaDetealhesEvento = null;
     }
-    
+
     App.state.filtroEventoId = null;
+    console.log("zoom fechar detalhe", App.state.mapZoom);
+    console.log("center fechar detalhe", App.state.mapCenter);
+    App.state.map.setZoom(App.state.mapZoom);
+    App.state.map.setCenter(App.state.mapCenter);
     App.atualizarMarkers();
-    App.state.map.panBy(0, 150);
+    App.state.infoWindowOpen = false;
 }
 

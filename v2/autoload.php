@@ -5,9 +5,9 @@ $server = $_SERVER['SERVER_NAME'] ?? ($_SERVER['HTTP_HOST'] ?? 'localhost');
 
 if ($server === 'localhost') {
     // require_once __DIR__ . '/config/secretConstants.dev.php';
-    require_once __DIR__ . '/config/secretConstants.prod.php'; //provisorio
+    require_once __DIR__ . '/../secretsConstants.dev.php'; //provisorio
 } else {
-    require_once __DIR__ . '/config/secretConstants.prod.php';
+    require_once __DIR__ . '/../secretsConstants.prod.php';
 }
 
 spl_autoload_register(function ($class) {

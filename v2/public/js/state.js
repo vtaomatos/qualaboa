@@ -15,7 +15,10 @@ window.App = {
             lng: -46.3331
         },
         divAbertaDetealhesEvento: null,
-        imgDefault: '/imagens/sem_imagem.jpg'
+        imgDefault: '/imagens/sem_imagem.jpg',
+        mapCenter: { lat: -23.9608, lng: -46.3331 },
+        mapZoom: 12,
+        infoWindowOpen: false
     }
 };
 
