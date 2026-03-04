@@ -361,10 +361,6 @@ App.mostrarDetalhesEvento = async function (ev, itemEvento) {
 
         <div class="card-body">
             ${ev.descricao ? `<p class="card-text">${ev.descricao}</p>` : ""}
-            <ul class="list-unstyled mb-3">
-                ${ev.local_nome ? `<li><strong>Local:</strong> ${ev.local_nome}</li>` : ""}
-                ${ev.data_evento ? `<li><strong>Data:</strong> ${ev.data_evento.split(' ')[0]}</li>` : ""}
-            </ul>
 
             <div class="d-flex gap-2">
                 <button class="btn btn-outline-secondary flex-grow-1" id="btnVoltarDetalhe">← Voltar</button>

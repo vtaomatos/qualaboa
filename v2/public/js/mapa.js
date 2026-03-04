@@ -210,6 +210,7 @@ App.initFiltros = function () {
 
             App.state.categoriasAtivas = selecionados;
 
+            App.fecharDetalheEventoAgendaComInfoWindow();
             App.atualizarMarkers();
             App.renderEventosDia()
         }
