@@ -335,12 +335,12 @@ App.mostrarDetalhesEvento = async function (ev, itemEvento) {
         } else if (data.html) {
             htmlContent = data.html;
         } else {
-            img = imgDefault;
+            img = App.state.imgDefault;
         }
 
     } catch (err) {
         console.error("Erro ao buscar imagem do evento", err);
-        img = imgDefault;
+        img = App.state.imgDefault;
     }
 
     // Cria a div de detalhe
@@ -391,9 +391,13 @@ App.mostrarDetalhesEvento = async function (ev, itemEvento) {
 };
 
 App.fecharDetalheEventoAgendaComInfoWindow = function () {
-    App.state.divAbertaDetealhesEvento.remove();
-    App.state.divAbertaDetealhesEvento = null;
-    document.querySelector('#infowindow-close').click();
-    App.state.map.panBy(0, 250);
+    if (App.state.divAbertaDetealhesEvento) {
+        App.state.divAbertaDetealhesEvento.remove();
+        App.state.divAbertaDetealhesEvento = null;
+    }
+    
+    App.state.filtroEventoId = null;
+    App.atualizarMarkers();
+    App.state.map.panBy(0, 150);
 }
 

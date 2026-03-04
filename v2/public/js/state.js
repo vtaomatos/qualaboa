@@ -14,7 +14,8 @@ window.App = {
             lat: -23.9608,
             lng: -46.3331
         },
-        divAbertaDetealhesEvento: null
+        divAbertaDetealhesEvento: null,
+        imgDefault: '/imagens/sem_imagem.jpg'
     }
 };
 

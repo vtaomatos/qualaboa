@@ -240,7 +240,6 @@ App.criarSliderEventos = function (eventos) {
 }
 
 App.carregarImagensEventos = function (eventos) {
-    const imgDefault = '/imagens/sem_imagem.jpg';
 
     eventos.forEach(ev => {
 
@@ -267,7 +266,7 @@ App.carregarImagensEventos = function (eventos) {
 
                 // Caso 3: fallback
                 else {
-                    img.src = imgDefault;
+                    img.src = App.state.imgDefault;
                 }
 
                 img.onload = () => {
@@ -279,7 +278,7 @@ App.carregarImagensEventos = function (eventos) {
             })
             .catch(() => {
                 const img = document.getElementById(`flyer-${ev.id}`);
-                if (img) img.src = imgDefault;
+                if (img) img.src = App.state.imgDefault;
             });
 
     });

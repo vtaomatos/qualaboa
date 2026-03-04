@@ -4,7 +4,7 @@ RewriteEngine On
 # STORIES_CAPTURADOS - prioridade máxima
 # ============================================
 
-RewriteCond %{REQUEST_URI} ^/stories_capturados/
+RewriteCond %{REQUEST_URI} ^/(stories_capturados|imagens)/
 RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -f
 RewriteRule ^ - [L]
 
